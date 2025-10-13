@@ -5,12 +5,31 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+// Errors
+error MemeSoulNFT__InvalidAddress();
+error MemeSoulNFT__TokenAlreadyLinked();
+error MemeSoulNFT__TokenNotFound();
+error MemeSoulNFT__UnauthorizedCaller();
+
 /**
  * @title MemeSoulNFT
  * @dev NFT representing the "soul" or identity of a memecoin
  * @notice Each memecoin gets one unique Soul NFT that can own assets via ERC-6551
  */
 contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
+    /*//////////////////////////////////////////////////////////////
+                            TYPE DECLARATIONS
+    //////////////////////////////////////////////////////////////*/
+
+    struct MemecoinMetadata {
+        string name;
+        string symbol;
+        string theme;
+        string logoURI;
+        uint256 createdAt;
+        address creator;
+    }
+
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
@@ -31,19 +50,6 @@ contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
     mapping(address => uint256) private _memecoinToTokenIdPlusOne;
 
     /*//////////////////////////////////////////////////////////////
-                                STRUCTS
-    //////////////////////////////////////////////////////////////*/
-
-    struct MemecoinMetadata {
-        string name;
-        string symbol;
-        string theme;
-        string logoURI;
-        uint256 createdAt;
-        address creator;
-    }
-
-    /*//////////////////////////////////////////////////////////////
                                 EVENTS
     //////////////////////////////////////////////////////////////*/
 
@@ -52,22 +58,13 @@ contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
     event MetadataUpdated(uint256 indexed tokenId);
 
     /*//////////////////////////////////////////////////////////////
-                                ERRORS
-    //////////////////////////////////////////////////////////////*/
-
-    error InvalidAddress();
-    error TokenAlreadyLinked();
-    error TokenNotFound();
-    error UnauthorizedCaller();
-
-    /*//////////////////////////////////////////////////////////////
                               CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
     constructor() ERC721("MemeForge Soul", "MEMSOUL") Ownable(msg.sender) {}
 
     /*//////////////////////////////////////////////////////////////
-                            MINTING FUNCTIONS
+                            EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
     /**
@@ -84,8 +81,8 @@ contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
         MemecoinMetadata memory metadata,
         string memory _tokenURI
     ) external onlyOwner returns (uint256) {
-        if (to == address(0) || memeToken == address(0)) revert InvalidAddress();
-        if (_memecoinToTokenIdPlusOne[memeToken] != 0) revert TokenAlreadyLinked();
+        if (to == address(0) || memeToken == address(0)) revert MemeSoulNFT__InvalidAddress();
+        if (_memecoinToTokenIdPlusOne[memeToken] != 0) revert MemeSoulNFT__TokenAlreadyLinked();
 
         uint256 tokenId = _tokenIdCounter;
         _tokenIdCounter++;
@@ -113,8 +110,8 @@ contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
      * @param tbaAddress Address of the token-bound account
      */
     function linkTokenBoundAccount(uint256 tokenId, address tbaAddress) external onlyOwner {
-        if (tbaAddress == address(0)) revert InvalidAddress();
-        if (ownerOf(tokenId) == address(0)) revert TokenNotFound();
+        if (tbaAddress == address(0)) revert MemeSoulNFT__InvalidAddress();
+        if (ownerOf(tokenId) == address(0)) revert MemeSoulNFT__TokenNotFound();
 
         tokenBoundAccount[tokenId] = tbaAddress;
 
@@ -132,7 +129,7 @@ contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
      */
     function updateTokenURI(uint256 tokenId, string memory newTokenURI) external {
         if (ownerOf(tokenId) != msg.sender && owner() != msg.sender) {
-            revert UnauthorizedCaller();
+            revert MemeSoulNFT__UnauthorizedCaller();
         }
 
         _setTokenURI(tokenId, newTokenURI);
@@ -146,7 +143,7 @@ contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
      */
     function updateLogoURI(uint256 tokenId, string memory newLogoURI) external {
         if (ownerOf(tokenId) != msg.sender && owner() != msg.sender) {
-            revert UnauthorizedCaller();
+            revert MemeSoulNFT__UnauthorizedCaller();
         }
 
         memecoinMetadata[tokenId].logoURI = newLogoURI;
@@ -191,7 +188,7 @@ contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
      */
     function getTokenIdByMemecoin(address memeToken) external view returns (uint256) {
         uint256 tokenIdPlusOne = _memecoinToTokenIdPlusOne[memeToken];
-        if (tokenIdPlusOne == 0) revert TokenNotFound();
+        if (tokenIdPlusOne == 0) revert MemeSoulNFT__TokenNotFound();
         return tokenIdPlusOne - 1;
     }
 

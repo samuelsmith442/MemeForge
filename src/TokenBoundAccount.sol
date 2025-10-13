@@ -8,6 +8,11 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IERC6551Account.sol";
 
+// Errors
+error TokenBoundAccount__InvalidSigner();
+error TokenBoundAccount__InvalidOperation();
+error TokenBoundAccount__ExecutionFailed();
+
 /**
  * @title TokenBoundAccount
  * @dev Implementation of ERC-6551 token-bound account
@@ -25,15 +30,7 @@ contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Execut
     uint256 public state;
 
     /*//////////////////////////////////////////////////////////////
-                                ERRORS
-    //////////////////////////////////////////////////////////////*/
-
-    error InvalidSigner();
-    error InvalidOperation();
-    error ExecutionFailed();
-
-    /*//////////////////////////////////////////////////////////////
-                              CONSTRUCTOR
+                               CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
     constructor() {
@@ -50,7 +47,7 @@ contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Execut
     receive() external payable {}
 
     /*//////////////////////////////////////////////////////////////
-                            EXECUTION FUNCTIONS
+                            EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
     /**
@@ -69,8 +66,8 @@ contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Execut
         nonReentrant
         returns (bytes memory result)
     {
-        if (!_isValidSigner(msg.sender)) revert InvalidSigner();
-        if (operation != 0) revert InvalidOperation();
+        if (!_isValidSigner(msg.sender)) revert TokenBoundAccount__InvalidSigner();
+        if (operation != 0) revert TokenBoundAccount__InvalidOperation();
 
         // Increment state to track changes
         ++state;
@@ -86,10 +83,6 @@ contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Execut
             }
         }
     }
-
-    /*//////////////////////////////////////////////////////////////
-                            SIGNER VALIDATION
-    //////////////////////////////////////////////////////////////*/
 
     /**
      * @notice Checks if a signer is valid
@@ -130,8 +123,18 @@ contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Execut
         return bytes4(0);
     }
 
+    /**
+     * @notice Checks if this contract supports an interface
+     * @param interfaceId Interface ID to check
+     * @return True if interface is supported
+     */
+    function supportsInterface(bytes4 interfaceId) external pure virtual returns (bool) {
+        return interfaceId == type(IERC165).interfaceId || interfaceId == type(IERC6551Account).interfaceId
+            || interfaceId == type(IERC6551Executable).interfaceId;
+    }
+
     /*//////////////////////////////////////////////////////////////
-                            VIEW FUNCTIONS
+                            PUBLIC FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
     /**
@@ -165,16 +168,6 @@ contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Execut
         if (chainId != _deploymentChainId) return address(0);
 
         return IERC721(tokenContract).ownerOf(tokenId);
-    }
-
-    /**
-     * @notice Checks if this contract supports an interface
-     * @param interfaceId Interface ID to check
-     * @return True if interface is supported
-     */
-    function supportsInterface(bytes4 interfaceId) external pure virtual returns (bool) {
-        return interfaceId == type(IERC165).interfaceId || interfaceId == type(IERC6551Account).interfaceId
-            || interfaceId == type(IERC6551Executable).interfaceId;
     }
 
     /*//////////////////////////////////////////////////////////////

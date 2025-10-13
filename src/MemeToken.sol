@@ -6,6 +6,14 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+// Errors
+error MemeToken__InsufficientBalance();
+error MemeToken__InsufficientStakedBalance();
+error MemeToken__StakingNotActive();
+error MemeToken__InvalidAddress();
+error MemeToken__InvalidAmount();
+error MemeToken__NoRewardsToClaim();
+
 /**
  * @title MemeToken
  * @dev AI-generated memecoin with built-in utility mechanisms
@@ -63,17 +71,6 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     event StakingStatusChanged(bool active);
 
     /*//////////////////////////////////////////////////////////////
-                                ERRORS
-    //////////////////////////////////////////////////////////////*/
-
-    error InsufficientBalance();
-    error InsufficientStakedBalance();
-    error StakingNotActive();
-    error InvalidAddress();
-    error InvalidAmount();
-    error NoRewardsToClaim();
-
-    /*//////////////////////////////////////////////////////////////
                               CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
@@ -110,9 +107,9 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      * @param amount Amount of tokens to stake
      */
     function stake(uint256 amount) external nonReentrant {
-        if (!stakingActive) revert StakingNotActive();
-        if (amount == 0) revert InvalidAmount();
-        if (balanceOf(msg.sender) < amount) revert InsufficientBalance();
+        if (!stakingActive) revert MemeToken__StakingNotActive();
+        if (amount == 0) revert MemeToken__InvalidAmount();
+        if (balanceOf(msg.sender) < amount) revert MemeToken__InsufficientBalance();
 
         // Update pending rewards before changing stake
         _updateRewards(msg.sender);
@@ -133,8 +130,8 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      * @param amount Amount of tokens to unstake
      */
     function unstake(uint256 amount) external nonReentrant {
-        if (amount == 0) revert InvalidAmount();
-        if (stakedBalance[msg.sender] < amount) revert InsufficientStakedBalance();
+        if (amount == 0) revert MemeToken__InvalidAmount();
+        if (stakedBalance[msg.sender] < amount) revert MemeToken__InsufficientStakedBalance();
 
         // Update and claim pending rewards
         _updateRewards(msg.sender);
@@ -192,7 +189,7 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      */
     function _claimRewards(address user) internal {
         uint256 rewards = pendingRewards[user];
-        if (rewards == 0) revert NoRewardsToClaim();
+        if (rewards == 0) revert MemeToken__NoRewardsToClaim();
 
         pendingRewards[user] = 0;
 
@@ -213,11 +210,11 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      * @param support Whether to support the proposal
      */
     function vote(uint256 proposalId, bool support) external {
-        if (governance == address(0)) revert InvalidAddress();
+        if (governance == address(0)) revert MemeToken__InvalidAddress();
 
         // Voting power is based on token balance
         uint256 votingPower = balanceOf(msg.sender);
-        if (votingPower == 0) revert InsufficientBalance();
+        if (votingPower == 0) revert MemeToken__InsufficientBalance();
 
         // Call governance contract (will be implemented in Phase 2)
         // IGovernance(governance).castVote(proposalId, msg.sender, support, votingPower);
@@ -232,7 +229,7 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      * @param _stakingVault Address of the staking vault
      */
     function setStakingVault(address _stakingVault) external onlyOwner {
-        if (_stakingVault == address(0)) revert InvalidAddress();
+        if (_stakingVault == address(0)) revert MemeToken__InvalidAddress();
         stakingVault = _stakingVault;
         emit StakingVaultSet(_stakingVault);
     }
@@ -242,7 +239,7 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      * @param _governance Address of the governance contract
      */
     function setGovernance(address _governance) external onlyOwner {
-        if (_governance == address(0)) revert InvalidAddress();
+        if (_governance == address(0)) revert MemeToken__InvalidAddress();
         governance = _governance;
         emit GovernanceSet(_governance);
     }
@@ -252,7 +249,7 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      * @param _soulNFT Address of the Soul NFT
      */
     function setSoulNFT(address _soulNFT) external onlyOwner {
-        if (_soulNFT == address(0)) revert InvalidAddress();
+        if (_soulNFT == address(0)) revert MemeToken__InvalidAddress();
         soulNFT = _soulNFT;
         emit SoulNFTSet(_soulNFT);
     }

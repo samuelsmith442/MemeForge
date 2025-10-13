@@ -121,13 +121,13 @@ contract MemeTokenTest is Test {
 
     function test_RevertWhen_StakeInsufficientBalance() public {
         vm.prank(user1);
-        vm.expectRevert(MemeToken.InsufficientBalance.selector);
+        vm.expectRevert(MemeToken__InsufficientBalance.selector);
         memeToken.stake(1000 * 1e18); // user1 has no tokens
     }
 
     function test_RevertWhen_StakeZeroAmount() public {
         vm.prank(owner);
-        vm.expectRevert(MemeToken.InvalidAmount.selector);
+        vm.expectRevert(MemeToken__InvalidAmount.selector);
         memeToken.stake(0);
     }
 
@@ -162,7 +162,7 @@ contract MemeTokenTest is Test {
         memeToken.stake(5000 * 1e18);
 
         vm.prank(user1);
-        vm.expectRevert(MemeToken.InsufficientStakedBalance.selector);
+        vm.expectRevert(MemeToken__InsufficientStakedBalance.selector);
         memeToken.unstake(6000 * 1e18); // More than staked
     }
 
