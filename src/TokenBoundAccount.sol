@@ -8,17 +8,19 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IERC6551Account.sol";
 
-// Errors
-error TokenBoundAccount__InvalidSigner();
-error TokenBoundAccount__InvalidOperation();
-error TokenBoundAccount__ExecutionFailed();
-
 /**
  * @title TokenBoundAccount
  * @dev Implementation of ERC-6551 token-bound account
  * @notice A smart contract wallet owned by an NFT
  */
 contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Executable, ReentrancyGuard {
+    ///////////////////
+    // Errors
+    ///////////////////
+    error TokenBoundAccount__InvalidSigner();
+    error TokenBoundAccount__InvalidOperation();
+    error TokenBoundAccount__ExecutionFailed();
+
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/

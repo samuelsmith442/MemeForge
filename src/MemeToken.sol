@@ -6,20 +6,22 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-// Errors
-error MemeToken__InsufficientBalance();
-error MemeToken__InsufficientStakedBalance();
-error MemeToken__StakingNotActive();
-error MemeToken__InvalidAddress();
-error MemeToken__InvalidAmount();
-error MemeToken__NoRewardsToClaim();
-
 /**
  * @title MemeToken
  * @dev AI-generated memecoin with built-in utility mechanisms
  * @notice This contract represents a memecoin with staking and governance capabilities
  */
 contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
+    ///////////////////
+    // Errors
+    ///////////////////
+    error MemeToken__InsufficientBalance();
+    error MemeToken__InsufficientStakedBalance();
+    error MemeToken__StakingNotActive();
+    error MemeToken__InvalidAddress();
+    error MemeToken__InvalidAmount();
+    error MemeToken__NoRewardsToClaim();
+
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/

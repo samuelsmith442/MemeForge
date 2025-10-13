@@ -18,19 +18,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 ```
 
-### 3. **Errors**
-Custom error declarations outside the contract (for better gas efficiency and to avoid naming conflicts):
-```solidity
-error ContractName__ErrorDescription();
-error ContractName__AnotherError();
-```
-
-**Naming Convention:** `ContractName__ErrorDescription`
-- Prefix with contract name to avoid conflicts
-- Use double underscore separator
-- Descriptive error name in PascalCase
-
-### 4. **Contract Documentation & Definition**
+### 3. **Contract Documentation & Definition**
 ```solidity
 /**
  * @title ContractName
@@ -39,6 +27,24 @@ error ContractName__AnotherError();
  */
 contract ContractName is Parent1, Parent2 {
 ```
+
+### 4. **Errors**
+Custom error declarations inside the contract (contract-specific errors):
+```solidity
+contract ContractName {
+    ///////////////////
+    // Errors
+    ///////////////////
+    error ContractName__ErrorDescription();
+    error ContractName__AnotherError();
+}
+```
+
+**Naming Convention:** `ContractName__ErrorDescription`
+- Prefix with contract name to avoid conflicts
+- Use double underscore separator
+- Descriptive error name in PascalCase
+- Declared inside contract for proper scoping
 
 ### 5. **Type Declarations**
 ```solidity
@@ -120,15 +126,17 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-// Errors
-error MemeToken__InsufficientBalance();
-error MemeToken__InvalidAddress();
-
 /**
  * @title MemeToken
  * @dev AI-generated memecoin with built-in utility mechanisms
  */
 contract MemeToken is ERC20, Ownable {
+    ///////////////////
+    // Errors
+    ///////////////////
+    error MemeToken__InsufficientBalance();
+    error MemeToken__InvalidAddress();
+    
     // State variables
     uint256 public rewardRate;
     
@@ -153,15 +161,17 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-// Errors
-error MemeSoulNFT__InvalidAddress();
-error MemeSoulNFT__TokenAlreadyLinked();
-
 /**
  * @title MemeSoulNFT
  * @dev NFT representing the "soul" or identity of a memecoin
  */
 contract MemeSoulNFT is ERC721, Ownable {
+    ///////////////////
+    // Errors
+    ///////////////////
+    error MemeSoulNFT__InvalidAddress();
+    error MemeSoulNFT__TokenAlreadyLinked();
+    
     // Type declarations
     struct MemecoinMetadata {
         string name;
@@ -189,15 +199,17 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-// Errors
-error TokenBoundAccount__InvalidSigner();
-error TokenBoundAccount__InvalidOperation();
-
 /**
  * @title TokenBoundAccount
  * @dev Implementation of ERC-6551 token-bound account
  */
 contract TokenBoundAccount is ReentrancyGuard {
+    ///////////////////
+    // Errors
+    ///////////////////
+    error TokenBoundAccount__InvalidSigner();
+    error TokenBoundAccount__InvalidOperation();
+    
     // State variables
     uint256 private immutable _deploymentChainId;
     
@@ -225,9 +237,10 @@ contract TokenBoundAccount is ReentrancyGuard {
 1. **Consistency**: All contracts follow the same structure
 2. **Readability**: Easy to navigate and understand
 3. **Maintainability**: Predictable location for each element
-4. **Gas Efficiency**: Errors declared outside contract save gas
+4. **Proper Scoping**: Errors declared inside contract are properly scoped
 5. **Conflict Avoidance**: Namespaced errors prevent collisions
-6. **Best Practices**: Follows Solidity style guide recommendations
+6. **Best Practices**: Follows Patrick Collins and Solidity style guide recommendations
+7. **Encapsulation**: Contract-specific errors stay with their contract
 
 ---
 
@@ -248,6 +261,8 @@ ContractName__ErrorDescription
 - Makes errors easily traceable to their source
 - Improves debugging experience
 - Follows modern Solidity best practices
+- Properly scoped within the contract
+- Referenced in tests as `ContractName.ErrorName.selector`
 
 ---
 

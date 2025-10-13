@@ -5,18 +5,20 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// Errors
-error MemeSoulNFT__InvalidAddress();
-error MemeSoulNFT__TokenAlreadyLinked();
-error MemeSoulNFT__TokenNotFound();
-error MemeSoulNFT__UnauthorizedCaller();
-
 /**
  * @title MemeSoulNFT
  * @dev NFT representing the "soul" or identity of a memecoin
  * @notice Each memecoin gets one unique Soul NFT that can own assets via ERC-6551
  */
 contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
+    ///////////////////
+    // Errors
+    ///////////////////
+    error MemeSoulNFT__InvalidAddress();
+    error MemeSoulNFT__TokenAlreadyLinked();
+    error MemeSoulNFT__TokenNotFound();
+    error MemeSoulNFT__UnauthorizedCaller();
+
     /*//////////////////////////////////////////////////////////////
                             TYPE DECLARATIONS
     //////////////////////////////////////////////////////////////*/

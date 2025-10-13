@@ -286,7 +286,7 @@ contract ERC6551Test is Test {
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
         
         vm.prank(user1); // Not the NFT owner
-        vm.expectRevert(TokenBoundAccount__InvalidSigner.selector);
+        vm.expectRevert(TokenBoundAccount.TokenBoundAccount__InvalidSigner.selector);
         tba.execute(user1, 0, "", 0);
     }
 

@@ -122,7 +122,7 @@ contract MemeSoulNFTTest is Test {
         });
 
         vm.prank(owner);
-        vm.expectRevert(MemeSoulNFT__InvalidAddress.selector);
+        vm.expectRevert(MemeSoulNFT.MemeSoulNFT__InvalidAddress.selector);
         soulNFT.mintSoulNFT(address(0), address(memeToken), metadata, "ipfs://QmNFT");
     }
 
@@ -137,7 +137,7 @@ contract MemeSoulNFTTest is Test {
         });
 
         vm.prank(owner);
-        vm.expectRevert(MemeSoulNFT__InvalidAddress.selector);
+        vm.expectRevert(MemeSoulNFT.MemeSoulNFT__InvalidAddress.selector);
         soulNFT.mintSoulNFT(creator, address(0), metadata, "ipfs://QmNFT");
     }
 
@@ -154,7 +154,7 @@ contract MemeSoulNFTTest is Test {
         vm.startPrank(owner);
         soulNFT.mintSoulNFT(creator, address(memeToken), metadata, "ipfs://QmNFT");
 
-        vm.expectRevert(MemeSoulNFT__TokenAlreadyLinked.selector);
+        vm.expectRevert(MemeSoulNFT.MemeSoulNFT__TokenAlreadyLinked.selector);
         soulNFT.mintSoulNFT(user1, address(memeToken), metadata, "ipfs://QmNFT2");
         vm.stopPrank();
     }
@@ -213,7 +213,7 @@ contract MemeSoulNFTTest is Test {
         uint256 tokenId = soulNFT.mintSoulNFT(creator, address(memeToken), metadata, "ipfs://QmNFT");
 
         vm.prank(owner);
-        vm.expectRevert(MemeSoulNFT__InvalidAddress.selector);
+        vm.expectRevert(MemeSoulNFT.MemeSoulNFT__InvalidAddress.selector);
         soulNFT.linkTokenBoundAccount(tokenId, address(0));
     }
 
@@ -297,7 +297,7 @@ contract MemeSoulNFTTest is Test {
         uint256 tokenId = soulNFT.mintSoulNFT(creator, address(memeToken), metadata, "ipfs://QmNFT");
 
         vm.prank(user1);
-        vm.expectRevert(MemeSoulNFT__UnauthorizedCaller.selector);
+        vm.expectRevert(MemeSoulNFT.MemeSoulNFT__UnauthorizedCaller.selector);
         soulNFT.updateTokenURI(tokenId, "ipfs://QmNewNFT");
     }
 
