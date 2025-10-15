@@ -6,6 +6,8 @@ import {MemeToken} from "../src/MemeToken.sol";
 import {MemeSoulNFT} from "../src/MemeSoulNFT.sol";
 import {ERC6551Registry} from "../src/ERC6551Registry.sol";
 import {TokenBoundAccount} from "../src/TokenBoundAccount.sol";
+import {StakingVault} from "../src/StakingVault.sol";
+import {MockVRFCoordinatorV2} from "../src/mocks/MockVRFCoordinatorV2.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
 
 /**
@@ -20,6 +22,8 @@ contract DeployMemeForge is Script {
             ERC6551Registry registry,
             TokenBoundAccount implementation,
             MemeSoulNFT soulNFT,
+            StakingVault stakingVault,
+            MockVRFCoordinatorV2 mockVRF,
             MemeToken exampleToken,
             HelperConfig helperConfig
         )
@@ -55,18 +59,40 @@ contract DeployMemeForge is Script {
         console.log("MemeSoulNFT deployed at:", address(soulNFT));
         console.log("MemeSoulNFT Owner:", soulNFT.owner());
 
+        // Deploy Mock VRF Coordinator (for local testing)
+        mockVRF = new MockVRFCoordinatorV2();
+        console.log("MockVRFCoordinatorV2 deployed at:", address(mockVRF));
+
+        // Deploy StakingVault with Mock VRF
+        stakingVault = new StakingVault(
+            address(mockVRF), // VRF Coordinator
+            1, // Subscription ID
+            bytes32(uint256(1)), // Key Hash
+            500_000 // Callback Gas Limit
+        );
+        console.log("StakingVault deployed at:", address(stakingVault));
+        console.log("StakingVault Owner:", stakingVault.owner());
+
         // Deploy an example MemeToken
         exampleToken = new MemeToken(
             "MeowFi", // name
             "MEOW", // symbol
             1_000_000 * 1e18, // initial supply (1 million tokens)
-            1e18, // reward rate (1 token per second)
+            1e15, // reward rate (0.001 tokens per second per token staked)
             "A memecoin for cat lovers", // theme
             "ipfs://QmExampleLogoURI" // logoURI
         );
         console.log("Example MemeToken deployed at:", address(exampleToken));
         console.log("MemeToken Owner:", exampleToken.owner());
         console.log("MemeToken Total Supply:", exampleToken.totalSupply());
+
+        // Configure the example token in the staking vault
+        stakingVault.configureToken(address(exampleToken), 1e15, true);
+        console.log("Example MemeToken configured in StakingVault");
+
+        // Set the staking vault on the example token
+        exampleToken.setStakingVault(address(stakingVault));
+        console.log("StakingVault set on Example MemeToken");
 
         // Stop broadcasting transactions
         vm.stopBroadcast();
@@ -78,9 +104,11 @@ contract DeployMemeForge is Script {
         console.log("ERC6551Registry:", address(registry));
         console.log("TokenBoundAccount Implementation:", address(implementation));
         console.log("MemeSoulNFT:", address(soulNFT));
+        console.log("MockVRFCoordinatorV2:", address(mockVRF));
+        console.log("StakingVault:", address(stakingVault));
         console.log("Example MemeToken:", address(exampleToken));
         console.log("=====================================\n");
 
-        return (registry, implementation, soulNFT, exampleToken, helperConfig);
+        return (registry, implementation, soulNFT, stakingVault, mockVRF, exampleToken, helperConfig);
     }
 }

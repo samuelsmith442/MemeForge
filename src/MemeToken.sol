@@ -237,6 +237,16 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     }
 
     /**
+     * @notice Mint tokens (only callable by staking vault for rewards)
+     * @param to Address to mint to
+     * @param amount Amount to mint
+     */
+    function mint(address to, uint256 amount) external {
+        if (msg.sender != stakingVault && msg.sender != owner()) revert MemeToken__InvalidAddress();
+        _mint(to, amount);
+    }
+
+    /**
      * @notice Set the governance contract address
      * @param _governance Address of the governance contract
      */
