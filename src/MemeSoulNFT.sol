@@ -77,12 +77,11 @@ contract MemeSoulNFT is ERC721, ERC721URIStorage, Ownable {
      * @param _tokenURI URI for the NFT metadata
      * @return tokenId The ID of the minted NFT
      */
-    function mintSoulNFT(
-        address to,
-        address memeToken,
-        MemecoinMetadata memory metadata,
-        string memory _tokenURI
-    ) external onlyOwner returns (uint256) {
+    function mintSoulNFT(address to, address memeToken, MemecoinMetadata memory metadata, string memory _tokenURI)
+        external
+        onlyOwner
+        returns (uint256)
+    {
         if (to == address(0) || memeToken == address(0)) revert MemeSoulNFT__InvalidAddress();
         if (_memecoinToTokenIdPlusOne[memeToken] != 0) revert MemeSoulNFT__TokenAlreadyLinked();
 

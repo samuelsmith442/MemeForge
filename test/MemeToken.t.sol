@@ -21,12 +21,7 @@ contract MemeTokenTest is Test {
 
         // Deploy MemeToken
         memeToken = new MemeToken(
-            "MeowFi",
-            "MEOW",
-            INITIAL_SUPPLY,
-            REWARD_RATE,
-            "A memecoin for cat lovers who love DeFi",
-            "ipfs://QmTest123"
+            "MeowFi", "MEOW", INITIAL_SUPPLY, REWARD_RATE, "A memecoin for cat lovers who love DeFi", "ipfs://QmTest123"
         );
 
         // Deploy Soul NFT

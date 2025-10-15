@@ -52,40 +52,40 @@ contract StakingVault is Ownable, ReentrancyGuard {
     ///////////////////
     // State Variables
     ///////////////////
-    
+
     /// @notice Chainlink VRF Coordinator
     IVRFCoordinatorV2 public immutable vrfCoordinator;
-    
+
     /// @notice VRF subscription ID
     uint64 public subscriptionId;
-    
+
     /// @notice VRF key hash
     bytes32 public keyHash;
-    
+
     /// @notice VRF callback gas limit
     uint32 public callbackGasLimit;
-    
+
     /// @notice VRF request confirmations
     uint16 public requestConfirmations;
-    
+
     /// @notice VRF number of random words
     uint32 public numWords;
 
     /// @notice Minimum multiplier (100 = 1x)
     uint256 public constant MIN_MULTIPLIER = 100;
-    
+
     /// @notice Maximum multiplier (500 = 5x)
     uint256 public constant MAX_MULTIPLIER = 500;
-    
+
     /// @notice Multiplier precision
     uint256 public constant MULTIPLIER_PRECISION = 100;
 
     /// @notice Mapping of token address to configuration
     mapping(address => TokenConfig) public tokenConfigs;
-    
+
     /// @notice Mapping of user => token => stake info
     mapping(address => mapping(address => StakeInfo)) public stakes;
-    
+
     /// @notice Mapping of VRF request ID to randomness request
     mapping(uint256 => RandomnessRequest) public randomnessRequests;
 
@@ -102,12 +102,9 @@ contract StakingVault is Ownable, ReentrancyGuard {
     ///////////////////
     // Constructor
     ///////////////////
-    constructor(
-        address _vrfCoordinator,
-        uint64 _subscriptionId,
-        bytes32 _keyHash,
-        uint32 _callbackGasLimit
-    ) Ownable(msg.sender) {
+    constructor(address _vrfCoordinator, uint64 _subscriptionId, bytes32 _keyHash, uint32 _callbackGasLimit)
+        Ownable(msg.sender)
+    {
         vrfCoordinator = IVRFCoordinatorV2(_vrfCoordinator);
         subscriptionId = _subscriptionId;
         keyHash = _keyHash;
@@ -139,7 +136,7 @@ contract StakingVault is Ownable, ReentrancyGuard {
         stakes[msg.sender][token].amount += amount;
         stakes[msg.sender][token].startTime = block.timestamp;
         stakes[msg.sender][token].lastClaimTime = block.timestamp;
-        
+
         tokenConfigs[token].totalStaked += amount;
 
         emit Staked(msg.sender, token, amount);
@@ -173,25 +170,16 @@ contract StakingVault is Ownable, ReentrancyGuard {
      */
     function claimRewards(address token) external nonReentrant {
         _updateRewards(msg.sender, token);
-        
+
         uint256 rewards = stakes[msg.sender][token].pendingRewards;
         if (rewards == 0) revert StakingVault__NoRewardsToClaim();
 
         // Request random multiplier from Chainlink VRF
-        uint256 requestId = vrfCoordinator.requestRandomWords(
-            keyHash,
-            subscriptionId,
-            requestConfirmations,
-            callbackGasLimit,
-            numWords
-        );
+        uint256 requestId =
+            vrfCoordinator.requestRandomWords(keyHash, subscriptionId, requestConfirmations, callbackGasLimit, numWords);
 
         // Store request info
-        randomnessRequests[requestId] = RandomnessRequest({
-            user: msg.sender,
-            token: token,
-            rewardAmount: rewards
-        });
+        randomnessRequests[requestId] = RandomnessRequest({user: msg.sender, token: token, rewardAmount: rewards});
 
         // Clear pending rewards (will be minted after VRF callback)
         stakes[msg.sender][token].pendingRewards = 0;
@@ -207,13 +195,13 @@ contract StakingVault is Ownable, ReentrancyGuard {
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) external nonReentrant {
         // Only VRF coordinator can call this
         require(msg.sender == address(vrfCoordinator), "Only VRF coordinator");
-        
+
         RandomnessRequest memory request = randomnessRequests[requestId];
         if (request.user == address(0)) revert StakingVault__RequestNotFound();
 
         // Calculate random multiplier (1x to 5x)
         uint256 multiplier = MIN_MULTIPLIER + (randomWords[0] % (MAX_MULTIPLIER - MIN_MULTIPLIER + 1));
-        
+
         // Calculate final reward with multiplier
         uint256 finalReward = (request.rewardAmount * multiplier) / MULTIPLIER_PRECISION;
 
@@ -278,7 +266,7 @@ contract StakingVault is Ownable, ReentrancyGuard {
      */
     function configureToken(address token, uint256 rewardRate, bool isActive) external onlyOwner {
         if (token == address(0)) revert StakingVault__InvalidToken();
-        
+
         tokenConfigs[token] = TokenConfig({
             rewardRate: rewardRate,
             totalStaked: tokenConfigs[token].totalStaked, // Preserve existing stakes
@@ -294,11 +282,7 @@ contract StakingVault is Ownable, ReentrancyGuard {
      * @param _keyHash New key hash
      * @param _callbackGasLimit New callback gas limit
      */
-    function updateVRFConfig(
-        uint64 _subscriptionId,
-        bytes32 _keyHash,
-        uint32 _callbackGasLimit
-    ) external onlyOwner {
+    function updateVRFConfig(uint64 _subscriptionId, bytes32 _keyHash, uint32 _callbackGasLimit) external onlyOwner {
         subscriptionId = _subscriptionId;
         keyHash = _keyHash;
         callbackGasLimit = _callbackGasLimit;

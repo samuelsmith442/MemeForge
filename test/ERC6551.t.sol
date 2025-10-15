@@ -30,14 +30,8 @@ contract ERC6551Test is Test {
         soulNFT = new MemeSoulNFT();
 
         // Deploy a memecoin
-        memeToken = new MemeToken(
-            "MeowFi",
-            "MEOW",
-            1_000_000 * 1e18,
-            1e18,
-            "A memecoin for cat lovers",
-            "ipfs://QmTest123"
-        );
+        memeToken =
+            new MemeToken("MeowFi", "MEOW", 1_000_000 * 1e18, 1e18, "A memecoin for cat lovers", "ipfs://QmTest123");
 
         vm.stopPrank();
     }
@@ -52,13 +46,7 @@ contract ERC6551Test is Test {
     }
 
     function test_ComputeAccountAddress() public view {
-        address computed = registry.account(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address computed = registry.account(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         // Should return a valid address
         assertTrue(computed != address(0));
@@ -66,17 +54,11 @@ contract ERC6551Test is Test {
 
     function test_CreateAccount() public {
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         // Account should be created
         assertTrue(account != address(0));
-        
+
         // Account should have code
         uint256 size;
         assembly {
@@ -87,22 +69,10 @@ contract ERC6551Test is Test {
 
     function test_CreateAccountIdempotent() public {
         vm.startPrank(owner);
-        
-        address account1 = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
 
-        address account2 = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account1 = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
+
+        address account2 = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         vm.stopPrank();
 
@@ -112,22 +82,10 @@ contract ERC6551Test is Test {
 
     function test_CreateAccountDifferentTokens() public {
         vm.startPrank(owner);
-        
-        address account1 = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
 
-        address account2 = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            1
-        );
+        address account1 = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
+
+        address account2 = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 1);
 
         vm.stopPrank();
 
@@ -142,13 +100,7 @@ contract ERC6551Test is Test {
     function test_AccountReceiveEther() public {
         // Create account
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         // Send Ether to account
         vm.deal(user1, 1 ether);
@@ -175,13 +127,7 @@ contract ERC6551Test is Test {
 
         // Create account for token ID 0
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         // Check token info
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
@@ -208,13 +154,7 @@ contract ERC6551Test is Test {
 
         // Create account
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         // Check owner
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
@@ -237,20 +177,14 @@ contract ERC6551Test is Test {
 
         // Create account
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         // Fund the account
         vm.deal(account, 1 ether);
 
         // Execute a transfer from the account
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
-        
+
         vm.prank(creator); // NFT owner
         tba.execute(user1, 0.5 ether, "", 0);
 
@@ -274,17 +208,11 @@ contract ERC6551Test is Test {
 
         // Create account
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         // Try to execute as non-owner
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
-        
+
         vm.prank(user1); // Not the NFT owner
         vm.expectRevert(TokenBoundAccount.TokenBoundAccount__InvalidSigner.selector);
         tba.execute(user1, 0, "", 0);
@@ -306,16 +234,10 @@ contract ERC6551Test is Test {
 
         // Create account
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
-        
+
         uint256 initialState = tba.state();
         assertEq(initialState, 0);
 
@@ -344,16 +266,10 @@ contract ERC6551Test is Test {
 
         // Create account
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
-        
+
         // Check if creator is valid signer
         bytes4 result = tba.isValidSigner(creator, "");
         assertEq(result, IERC6551Account.isValidSigner.selector);
@@ -365,22 +281,16 @@ contract ERC6551Test is Test {
 
     function test_AccountSupportsInterface() public {
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            0
-        );
+        address account = registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), 0);
 
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
-        
+
         // Should support ERC165
         assertTrue(tba.supportsInterface(type(IERC165).interfaceId));
-        
+
         // Should support IERC6551Account
         assertTrue(tba.supportsInterface(type(IERC6551Account).interfaceId));
-        
+
         // Should support IERC6551Executable
         assertTrue(tba.supportsInterface(type(IERC6551Executable).interfaceId));
     }
@@ -405,13 +315,8 @@ contract ERC6551Test is Test {
 
         // Create TBA for this NFT
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            tokenId
-        );
+        address account =
+            registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), tokenId);
 
         // Link TBA to Soul NFT
         vm.prank(owner);
@@ -423,7 +328,7 @@ contract ERC6551Test is Test {
         // Verify TBA knows its token
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
         (uint256 chainId, address tokenContract, uint256 tid) = tba.token();
-        
+
         assertEq(chainId, CHAIN_ID);
         assertEq(tokenContract, address(soulNFT));
         assertEq(tid, tokenId);
@@ -445,13 +350,8 @@ contract ERC6551Test is Test {
         uint256 tokenId = soulNFT.mintSoulNFT(creator, address(memeToken), metadata, "ipfs://QmNFT");
 
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            tokenId
-        );
+        address account =
+            registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), tokenId);
 
         // Transfer some memecoins to the TBA
         vm.prank(owner);
@@ -476,13 +376,8 @@ contract ERC6551Test is Test {
         uint256 tokenId = soulNFT.mintSoulNFT(creator, address(memeToken), metadata, "ipfs://QmNFT");
 
         vm.prank(owner);
-        address account = registry.createAccount(
-            address(implementation),
-            bytes32(0),
-            CHAIN_ID,
-            address(soulNFT),
-            tokenId
-        );
+        address account =
+            registry.createAccount(address(implementation), bytes32(0), CHAIN_ID, address(soulNFT), tokenId);
 
         // Transfer tokens to TBA
         vm.prank(owner);
@@ -491,7 +386,7 @@ contract ERC6551Test is Test {
         // NFT owner transfers tokens from TBA
         TokenBoundAccount tba = TokenBoundAccount(payable(account));
         bytes memory data = abi.encodeWithSignature("transfer(address,uint256)", user1, 500 * 1e18);
-        
+
         vm.prank(creator);
         tba.execute(address(memeToken), 0, data, 0);
 

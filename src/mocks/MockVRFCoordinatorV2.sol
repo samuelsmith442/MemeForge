@@ -19,11 +19,7 @@ contract MockVRFCoordinatorV2 is IVRFCoordinatorV2 {
     ///////////////////
     // Events
     ///////////////////
-    event RandomWordsRequested(
-        uint256 indexed requestId,
-        address indexed consumer,
-        uint32 numWords
-    );
+    event RandomWordsRequested(uint256 indexed requestId, address indexed consumer, uint32 numWords);
 
     ///////////////////
     // External Functions
@@ -49,13 +45,8 @@ contract MockVRFCoordinatorV2 is IVRFCoordinatorV2 {
         uint256[] memory randomWords = new uint256[](numWords);
         for (uint32 i = 0; i < numWords; i++) {
             // Use block data for pseudo-randomness (NOT SECURE - only for testing!)
-            randomWords[i] = uint256(keccak256(abi.encodePacked(
-                block.timestamp,
-                block.prevrandao,
-                msg.sender,
-                requestId,
-                i
-            )));
+            randomWords[i] =
+                uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, requestId, i)));
         }
 
         // Store the random words for later fulfillment
@@ -73,14 +64,9 @@ contract MockVRFCoordinatorV2 is IVRFCoordinatorV2 {
         require(consumer != address(0), "MockVRF: Request not found");
 
         uint256[] memory randomWords = requestToRandomWords[requestId];
-        
-        (bool success,) = consumer.call(
-            abi.encodeWithSignature(
-                "fulfillRandomWords(uint256,uint256[])",
-                requestId,
-                randomWords
-            )
-        );
+
+        (bool success,) =
+            consumer.call(abi.encodeWithSignature("fulfillRandomWords(uint256,uint256[])", requestId, randomWords));
 
         require(success, "MockVRF: Callback failed");
     }
@@ -94,13 +80,8 @@ contract MockVRFCoordinatorV2 is IVRFCoordinatorV2 {
         address consumer = requestToConsumer[requestId];
         require(consumer != address(0), "MockVRF: Request not found");
 
-        (bool success,) = consumer.call(
-            abi.encodeWithSignature(
-                "fulfillRandomWords(uint256,uint256[])",
-                requestId,
-                randomWords
-            )
-        );
+        (bool success,) =
+            consumer.call(abi.encodeWithSignature("fulfillRandomWords(uint256,uint256[])", requestId, randomWords));
 
         require(success, "MockVRF: Manual callback failed");
     }

@@ -92,12 +92,7 @@ contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Execut
      * @param context Additional context (unused)
      * @return magicValue Magic value if signer is valid, 0 otherwise
      */
-    function isValidSigner(address signer, bytes calldata context)
-        external
-        view
-        virtual
-        returns (bytes4 magicValue)
-    {
+    function isValidSigner(address signer, bytes calldata context) external view virtual returns (bytes4 magicValue) {
         if (_isValidSigner(signer)) {
             return IERC6551Account.isValidSigner.selector;
         }
@@ -110,12 +105,7 @@ contract TokenBoundAccount is IERC165, IERC1271, IERC6551Account, IERC6551Execut
      * @param signature Signature to validate
      * @return magicValue Magic value if signature is valid
      */
-    function isValidSignature(bytes32 hash, bytes memory signature)
-        external
-        view
-        virtual
-        returns (bytes4 magicValue)
-    {
+    function isValidSignature(bytes32 hash, bytes memory signature) external view virtual returns (bytes4 magicValue) {
         bool isValid = SignatureChecker.isValidSignatureNow(owner(), hash, signature);
 
         if (isValid) {

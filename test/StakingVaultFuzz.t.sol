@@ -32,22 +32,10 @@ contract StakingVaultFuzzTest is Test {
         mockVRF = new MockVRFCoordinatorV2();
 
         // Deploy staking vault
-        vault = new StakingVault(
-            address(mockVRF),
-            SUBSCRIPTION_ID,
-            KEY_HASH,
-            CALLBACK_GAS_LIMIT
-        );
+        vault = new StakingVault(address(mockVRF), SUBSCRIPTION_ID, KEY_HASH, CALLBACK_GAS_LIMIT);
 
         // Deploy test token
-        token = new MemeToken(
-            "FuzzToken",
-            "FUZZ",
-            INITIAL_SUPPLY,
-            REWARD_RATE,
-            "Fuzz test token",
-            "ipfs://fuzz"
-        );
+        token = new MemeToken("FuzzToken", "FUZZ", INITIAL_SUPPLY, REWARD_RATE, "Fuzz test token", "ipfs://fuzz");
 
         // Configure token in vault
         vault.configureToken(address(token), REWARD_RATE, true);
@@ -86,7 +74,7 @@ contract StakingVaultFuzzTest is Test {
         amount2 = bound(amount2, 1, INITIAL_SUPPLY / 6);
 
         vm.startPrank(user1);
-        
+
         // First stake
         token.approve(address(vault), amount1);
         vault.stake(address(token), amount1);
@@ -94,7 +82,7 @@ contract StakingVaultFuzzTest is Test {
         // Second stake
         token.approve(address(vault), amount2);
         vault.stake(address(token), amount2);
-        
+
         vm.stopPrank();
 
         (uint256 staked,,) = vault.getStakeInfo(user1, address(token));
@@ -124,7 +112,7 @@ contract StakingVaultFuzzTest is Test {
         assertEq(staked1, amount1);
         assertEq(staked2, amount2);
 
-        (,uint256 totalStaked,) = vault.getTokenConfig(address(token));
+        (, uint256 totalStaked,) = vault.getTokenConfig(address(token));
         assertEq(totalStaked, amount1 + amount2);
     }
 
@@ -138,14 +126,14 @@ contract StakingVaultFuzzTest is Test {
         unstakeAmount = bound(unstakeAmount, 1, stakeAmount);
 
         vm.startPrank(user1);
-        
+
         // Stake
         token.approve(address(vault), stakeAmount);
         vault.stake(address(token), stakeAmount);
 
         // Unstake
         vault.unstake(address(token), unstakeAmount);
-        
+
         vm.stopPrank();
 
         (uint256 remaining,,) = vault.getStakeInfo(user1, address(token));
@@ -153,12 +141,7 @@ contract StakingVaultFuzzTest is Test {
     }
 
     /// @dev Fuzz test: stake and unstake multiple times
-    function testFuzz_StakeUnstakeCycle(
-        uint256 stake1,
-        uint256 unstake1,
-        uint256 stake2,
-        uint256 unstake2
-    ) public {
+    function testFuzz_StakeUnstakeCycle(uint256 stake1, uint256 unstake1, uint256 stake2, uint256 unstake2) public {
         stake1 = bound(stake1, 1000, INITIAL_SUPPLY / 6);
         unstake1 = bound(unstake1, 1, stake1);
         stake2 = bound(stake2, 1, INITIAL_SUPPLY / 6);
@@ -235,12 +218,7 @@ contract StakingVaultFuzzTest is Test {
     }
 
     /// @dev Fuzz test: multiple claims with different time intervals
-    function testFuzz_MultipleClaims(
-        uint256 amount,
-        uint256 time1,
-        uint256 time2,
-        uint256 time3
-    ) public {
+    function testFuzz_MultipleClaims(uint256 amount, uint256 time1, uint256 time2, uint256 time3) public {
         amount = bound(amount, 1e18, INITIAL_SUPPLY / 10);
         time1 = bound(time1, 1 hours, 7 days);
         time2 = bound(time2, 1 hours, 7 days);
@@ -282,7 +260,7 @@ contract StakingVaultFuzzTest is Test {
         // Each claim gets its own multiplier, so we need to account for that
         uint256 totalTime = time1 + time2 + time3;
         uint256 baseReward = (amount * REWARD_RATE * totalTime) / 1e18;
-        
+
         // Since each of 3 claims can have 1x-5x multiplier independently,
         // minimum is 3x base (all 1x), maximum is 15x base (all 5x)
         uint256 minExpected = baseReward; // At least 1x on each claim
@@ -380,11 +358,7 @@ contract StakingVaultFuzzTest is Test {
     //////////////////////////////////////////////////////////////*/
 
     /// @dev Fuzz test: total staked accounting
-    function testFuzz_TotalStakedAccounting(
-        uint256 amount1,
-        uint256 amount2,
-        uint256 amount3
-    ) public {
+    function testFuzz_TotalStakedAccounting(uint256 amount1, uint256 amount2, uint256 amount3) public {
         amount1 = bound(amount1, 1e18, INITIAL_SUPPLY / 10);
         amount2 = bound(amount2, 1e18, INITIAL_SUPPLY / 10);
         amount3 = bound(amount3, 1e18, INITIAL_SUPPLY / 10);
@@ -407,16 +381,12 @@ contract StakingVaultFuzzTest is Test {
         vault.stake(address(token), amount3);
         vm.stopPrank();
 
-        (,uint256 totalStaked,) = vault.getTokenConfig(address(token));
+        (, uint256 totalStaked,) = vault.getTokenConfig(address(token));
         assertEq(totalStaked, amount1 + amount2 + amount3);
     }
 
     /// @dev Fuzz test: accounting after unstaking
-    function testFuzz_AccountingAfterUnstake(
-        uint256 stake1,
-        uint256 stake2,
-        uint256 unstake1
-    ) public {
+    function testFuzz_AccountingAfterUnstake(uint256 stake1, uint256 stake2, uint256 unstake1) public {
         stake1 = bound(stake1, 1e18, INITIAL_SUPPLY / 6);
         stake2 = bound(stake2, 1e18, INITIAL_SUPPLY / 6);
         unstake1 = bound(unstake1, 1, stake1);
@@ -436,7 +406,7 @@ contract StakingVaultFuzzTest is Test {
         vm.prank(user1);
         vault.unstake(address(token), unstake1);
 
-        (,uint256 totalStaked,) = vault.getTokenConfig(address(token));
+        (, uint256 totalStaked,) = vault.getTokenConfig(address(token));
         assertEq(totalStaked, stake1 - unstake1 + stake2);
     }
 
@@ -458,7 +428,7 @@ contract StakingVaultFuzzTest is Test {
 
         // Should not revert due to overflow
         uint256 rewards = vault.calculateRewards(user1, address(token));
-        
+
         // Verify rewards are reasonable
         uint256 expectedRewards = (amount * REWARD_RATE * timeElapsed) / 1e18;
         assertEq(rewards, expectedRewards);

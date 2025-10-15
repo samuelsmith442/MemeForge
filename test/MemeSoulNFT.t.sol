@@ -19,12 +19,7 @@ contract MemeSoulNFTTest is Test {
         // Deploy contracts
         soulNFT = new MemeSoulNFT();
         memeToken = new MemeToken(
-            "MeowFi",
-            "MEOW",
-            1_000_000 * 1e18,
-            1e18,
-            "A memecoin for cat lovers who love DeFi",
-            "ipfs://QmTest123"
+            "MeowFi", "MEOW", 1_000_000 * 1e18, 1e18, "A memecoin for cat lovers who love DeFi", "ipfs://QmTest123"
         );
 
         vm.stopPrank();
@@ -56,12 +51,7 @@ contract MemeSoulNFTTest is Test {
         });
 
         vm.prank(owner);
-        uint256 tokenId = soulNFT.mintSoulNFT(
-            creator,
-            address(memeToken),
-            metadata,
-            "ipfs://QmNFTMetadata"
-        );
+        uint256 tokenId = soulNFT.mintSoulNFT(creator, address(memeToken), metadata, "ipfs://QmNFTMetadata");
 
         assertEq(tokenId, 0);
         assertEq(soulNFT.ownerOf(tokenId), creator);
@@ -72,14 +62,8 @@ contract MemeSoulNFTTest is Test {
     function test_MintMultipleSoulNFTs() public {
         // Deploy second memecoin
         vm.prank(owner);
-        MemeToken memeToken2 = new MemeToken(
-            "DogeFi",
-            "DOGE",
-            1_000_000 * 1e18,
-            1e18,
-            "A memecoin for dog lovers",
-            "ipfs://QmTest456"
-        );
+        MemeToken memeToken2 =
+            new MemeToken("DogeFi", "DOGE", 1_000_000 * 1e18, 1e18, "A memecoin for dog lovers", "ipfs://QmTest456");
 
         MemeSoulNFT.MemecoinMetadata memory metadata1 = MemeSoulNFT.MemecoinMetadata({
             name: "MeowFi",

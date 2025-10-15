@@ -304,11 +304,7 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      * @return rewards Pending rewards
      * @return lastStake Last stake timestamp
      */
-    function getStakingInfo(address user)
-        external
-        view
-        returns (uint256 staked, uint256 rewards, uint256 lastStake)
-    {
+    function getStakingInfo(address user) external view returns (uint256 staked, uint256 rewards, uint256 lastStake) {
         return (stakedBalance[user], calculateRewards(user), lastStakeTime[user]);
     }
 
@@ -323,7 +319,13 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
     function getMetadata()
         external
         view
-        returns (string memory tokenName, string memory tokenSymbol, string memory themeStr, string memory logo, uint256 supply)
+        returns (
+            string memory tokenName,
+            string memory tokenSymbol,
+            string memory themeStr,
+            string memory logo,
+            uint256 supply
+        )
     {
         return (name(), symbol(), theme, logoURI, totalSupply());
     }

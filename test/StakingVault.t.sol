@@ -29,31 +29,12 @@ contract StakingVaultTest is Test {
         mockVRF = new MockVRFCoordinatorV2();
 
         // Deploy staking vault
-        vault = new StakingVault(
-            address(mockVRF),
-            SUBSCRIPTION_ID,
-            KEY_HASH,
-            CALLBACK_GAS_LIMIT
-        );
+        vault = new StakingVault(address(mockVRF), SUBSCRIPTION_ID, KEY_HASH, CALLBACK_GAS_LIMIT);
 
         // Deploy test tokens
-        token1 = new MemeToken(
-            "TestToken1",
-            "TT1",
-            INITIAL_SUPPLY,
-            REWARD_RATE,
-            "Test theme 1",
-            "ipfs://logo1"
-        );
+        token1 = new MemeToken("TestToken1", "TT1", INITIAL_SUPPLY, REWARD_RATE, "Test theme 1", "ipfs://logo1");
 
-        token2 = new MemeToken(
-            "TestToken2",
-            "TT2",
-            INITIAL_SUPPLY,
-            REWARD_RATE,
-            "Test theme 2",
-            "ipfs://logo2"
-        );
+        token2 = new MemeToken("TestToken2", "TT2", INITIAL_SUPPLY, REWARD_RATE, "Test theme 2", "ipfs://logo2");
 
         // Configure tokens in vault
         vault.configureToken(address(token1), REWARD_RATE, true);
@@ -107,7 +88,7 @@ contract StakingVaultTest is Test {
         assertEq(startTime, block.timestamp);
         assertEq(pendingRewards, 0);
 
-        (,uint256 totalStaked,) = vault.getTokenConfig(address(token1));
+        (, uint256 totalStaked,) = vault.getTokenConfig(address(token1));
         assertEq(totalStaked, stakeAmount);
     }
 
@@ -133,7 +114,7 @@ contract StakingVaultTest is Test {
         assertEq(amount1, stakeAmount1);
         assertEq(amount2, stakeAmount2);
 
-        (,uint256 totalStaked,) = vault.getTokenConfig(address(token1));
+        (, uint256 totalStaked,) = vault.getTokenConfig(address(token1));
         assertEq(totalStaked, stakeAmount1 + stakeAmount2);
     }
 
@@ -141,7 +122,7 @@ contract StakingVaultTest is Test {
         uint256 stakeAmount = 1000 * 1e18;
 
         vm.startPrank(user1);
-        
+
         // Stake token1
         token1.approve(address(vault), stakeAmount);
         vault.stake(address(token1), stakeAmount);
@@ -149,7 +130,7 @@ contract StakingVaultTest is Test {
         // Stake token2
         token2.approve(address(vault), stakeAmount);
         vault.stake(address(token2), stakeAmount);
-        
+
         vm.stopPrank();
 
         (uint256 amount1,,) = vault.getStakeInfo(user1, address(token1));
@@ -353,10 +334,10 @@ contract StakingVaultTest is Test {
         uint256 balanceBefore = token1.balanceOf(user1);
         vm.prank(user1);
         vault.claimRewards(address(token1));
-        
+
         // Fulfill VRF request
         mockVRF.fulfillRequest(1);
-        
+
         uint256 balanceAfter = token1.balanceOf(user1);
 
         assertTrue(balanceAfter > balanceBefore);

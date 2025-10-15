@@ -28,7 +28,7 @@ contract ERC6551Registry is IERC6551Registry {
     ) external returns (address) {
         assembly {
             // Memory Layout:
-            // ---- 
+            // ----
             // 0x00   0xff                     (1 byte)
             // 0x01   registry (address)       (20 bytes)
             // 0x15   salt (bytes32)           (32 bytes)
@@ -102,13 +102,11 @@ contract ERC6551Registry is IERC6551Registry {
      * @param tokenId ID of the NFT
      * @return The computed address of the token-bound account
      */
-    function account(
-        address implementation,
-        bytes32 salt,
-        uint256 chainId,
-        address tokenContract,
-        uint256 tokenId
-    ) external view returns (address) {
+    function account(address implementation, bytes32 salt, uint256 chainId, address tokenContract, uint256 tokenId)
+        external
+        view
+        returns (address)
+    {
         assembly {
             // Copy bytecode + constant data to memory
             calldatacopy(0x8c, 0x24, 0x80) // salt, chainId, tokenContract, tokenId
