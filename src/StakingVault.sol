@@ -182,6 +182,11 @@ contract StakingVault is Ownable, ReentrancyGuard {
             vrfCoordinator.requestRandomWords(keyHash, subscriptionId, requestConfirmations, callbackGasLimit, numWords);
 
         // Store request info
+        // Note: This state change after external call is safe because:
+        // 1. Function is protected by nonReentrant modifier
+        // 2. We need the requestId from the external call to store the mapping
+        // 3. VRF coordinator is a trusted Chainlink contract
+        // aderyn-fp-next-line(reentrancy-state-change)
         randomnessRequests[requestId] = RandomnessRequest({user: msg.sender, token: token, rewardAmount: rewards});
 
         emit RandomnessRequested(requestId, msg.sender, token);
