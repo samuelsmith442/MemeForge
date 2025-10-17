@@ -101,7 +101,7 @@ contract MemeToken is ERC20, ERC20Burnable, ERC20Votes, Ownable, ReentrancyGuard
         theme = _theme;
         logoURI = _logoURI;
         stakingActive = true;
-        
+
         // Self-delegate voting power to enable governance participation
         _delegate(msg.sender, msg.sender);
     }
@@ -344,10 +344,7 @@ contract MemeToken is ERC20, ERC20Burnable, ERC20Votes, Ownable, ReentrancyGuard
      * @dev Override required by ERC20Votes to update voting checkpoints
      * @notice This function is called on every token transfer
      */
-    function _update(address from, address to, uint256 value)
-        internal
-        override(ERC20, ERC20Votes)
-    {
+    function _update(address from, address to, uint256 value) internal override(ERC20, ERC20Votes) {
         super._update(from, to, value);
     }
 }
