@@ -3,15 +3,18 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 /**
  * @title MemeToken
  * @dev AI-generated memecoin with built-in utility mechanisms
  * @notice This contract represents a memecoin with staking and governance capabilities
+ * @dev Includes ERC20Votes for on-chain governance and delegation
  */
-contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
+contract MemeToken is ERC20, ERC20Burnable, ERC20Votes, Ownable, ReentrancyGuard {
     ///////////////////
     // Errors
     ///////////////////
@@ -92,12 +95,15 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
         uint256 _rewardRate,
         string memory _theme,
         string memory _logoURI
-    ) ERC20(_name, _symbol) Ownable(msg.sender) {
+    ) ERC20(_name, _symbol) Ownable(msg.sender) EIP712(_name, "1") {
         _mint(msg.sender, _initialSupply);
         rewardRate = _rewardRate;
         theme = _theme;
         logoURI = _logoURI;
         stakingActive = true;
+        
+        // Self-delegate voting power to enable governance participation
+        _delegate(msg.sender, msg.sender);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -328,5 +334,34 @@ contract MemeToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
         )
     {
         return (name(), symbol(), theme, logoURI, totalSupply());
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                        GOVERNANCE OVERRIDES
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @dev Override required by ERC20Votes to update voting checkpoints
+     * @notice This function is called on every token transfer
+     */
+    function _update(address from, address to, uint256 value)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._update(from, to, value);
+    }
+
+    /**
+     * @dev Override required by ERC20Votes
+     * @notice Returns the current nonce for an address (for EIP-2612 permits)
+     */
+    function nonces(address owner)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
+        return super.nonces(owner);
     }
 }
