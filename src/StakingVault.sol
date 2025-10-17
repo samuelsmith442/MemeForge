@@ -174,15 +174,15 @@ contract StakingVault is Ownable, ReentrancyGuard {
         uint256 rewards = stakes[msg.sender][token].pendingRewards;
         if (rewards == 0) revert StakingVault__NoRewardsToClaim();
 
-        // Request random multiplier from Chainlink VRF
+        // CEI Pattern: Clear pending rewards BEFORE external call
+        stakes[msg.sender][token].pendingRewards = 0;
+
+        // Request random multiplier from Chainlink VRF (external call)
         uint256 requestId =
             vrfCoordinator.requestRandomWords(keyHash, subscriptionId, requestConfirmations, callbackGasLimit, numWords);
 
         // Store request info
         randomnessRequests[requestId] = RandomnessRequest({user: msg.sender, token: token, rewardAmount: rewards});
-
-        // Clear pending rewards (will be minted after VRF callback)
-        stakes[msg.sender][token].pendingRewards = 0;
 
         emit RandomnessRequested(requestId, msg.sender, token);
     }
@@ -205,13 +205,13 @@ contract StakingVault is Ownable, ReentrancyGuard {
         // Calculate final reward with multiplier
         uint256 finalReward = (request.rewardAmount * multiplier) / MULTIPLIER_PRECISION;
 
-        // Mint rewards to user
+        // CEI Pattern: Clean up state BEFORE external call
+        delete randomnessRequests[requestId];
+
+        // Mint rewards to user (external call)
         IMintable(request.token).mint(request.user, finalReward);
 
         emit RewardsClaimed(request.user, request.token, finalReward, multiplier);
-
-        // Clean up request
-        delete randomnessRequests[requestId];
     }
 
     ///////////////////
