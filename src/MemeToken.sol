@@ -350,18 +350,4 @@ contract MemeToken is ERC20, ERC20Burnable, ERC20Votes, Ownable, ReentrancyGuard
     {
         super._update(from, to, value);
     }
-
-    /**
-     * @dev Override required by ERC20Votes
-     * @notice Returns the current nonce for an address (for EIP-2612 permits)
-     */
-    function nonces(address owner)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
-        return super.nonces(owner);
-    }
 }
