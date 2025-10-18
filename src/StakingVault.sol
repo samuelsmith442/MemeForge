@@ -24,7 +24,6 @@ contract StakingVault is Ownable, ReentrancyGuard {
     error StakingVault__NoRewardsToClaim();
     error StakingVault__InvalidToken();
     error StakingVault__StakingNotActive();
-    error StakingVault__InvalidMultiplier();
     error StakingVault__RequestNotFound();
 
     ///////////////////
