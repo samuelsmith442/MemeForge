@@ -83,11 +83,13 @@ contract ERC6551Registry is IERC6551Registry {
                 )
 
                 // Return the account address
+                // aderyn-fp-next-line(yul-return) - Intentional assembly return per ERC-6551 spec
                 return(0x6c, 0x20)
             }
 
             // Otherwise, return the computed account address
             mstore(0x00, shr(96, shl(96, computed)))
+            // aderyn-fp-next-line(yul-return) - Intentional assembly return per ERC-6551 spec
             return(0x00, 0x20)
         }
     }
@@ -124,6 +126,7 @@ contract ERC6551Registry is IERC6551Registry {
             mstore(0x00, shr(96, shl(96, keccak256(0x00, 0x55))))
 
             // Return computed account address
+            // aderyn-fp-next-line(yul-return) - Intentional assembly return per ERC-6551 spec
             return(0x00, 0x20)
         }
     }

@@ -5,8 +5,15 @@ import "../interfaces/IVRFCoordinatorV2.sol";
 
 /**
  * @title MockVRFCoordinatorV2
- * @notice Mock VRF Coordinator for testing
+ * @notice Mock VRF Coordinator for testing ONLY
  * @dev Provides instant randomness without actual Chainlink VRF
+ * 
+ * ⚠️ WARNING: DO NOT USE IN PRODUCTION ⚠️
+ * This contract uses weak randomness (block.timestamp, block.prevrandao) 
+ * which is predictable and manipulable by miners/validators.
+ * 
+ * FOR TESTING PURPOSES ONLY!
+ * Use real Chainlink VRF in production for cryptographically secure randomness.
  */
 contract MockVRFCoordinatorV2 is IVRFCoordinatorV2 {
     ///////////////////
@@ -44,7 +51,11 @@ contract MockVRFCoordinatorV2 is IVRFCoordinatorV2 {
         // Generate pseudo-random words
         uint256[] memory randomWords = new uint256[](numWords);
         for (uint32 i = 0; i < numWords; i++) {
-            // Use block data for pseudo-randomness (NOT SECURE - only for testing!)
+            // ⚠️ WEAK RANDOMNESS - TESTING ONLY ⚠️
+            // This uses predictable block data and is NOT cryptographically secure.
+            // Miners/validators can manipulate these values.
+            // Use real Chainlink VRF in production!
+            // aderyn-fp-next-line(weak-randomness) - Mock contract for testing only
             randomWords[i] =
                 uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, requestId, i)));
         }
