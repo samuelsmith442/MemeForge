@@ -214,10 +214,9 @@ contract MemeToken is ERC20, ERC20Burnable, ERC20Votes, Ownable, ReentrancyGuard
     /**
      * @notice Vote on a governance proposal
      * @dev This is a placeholder - full implementation in MemeGovernance.sol
-     * @param proposalId ID of the proposal
-     * @param support Whether to support the proposal
+     * Voting is now handled through MemeGovernor contract using ERC20Votes
      */
-    function vote(uint256 proposalId, bool support) external {
+    function vote(uint256 /* proposalId */, bool /* support */) external view {
         if (governance == address(0)) revert MemeToken__InvalidAddress();
 
         // Voting power is based on token balance

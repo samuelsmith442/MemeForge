@@ -132,7 +132,6 @@ contract DeployMemeForge is Script {
         // Grant roles to governor
         bytes32 proposerRole = timelock.PROPOSER_ROLE();
         bytes32 executorRole = timelock.EXECUTOR_ROLE();
-        bytes32 adminRole = timelock.DEFAULT_ADMIN_ROLE();
 
         timelock.grantRole(proposerRole, address(governor));
         timelock.grantRole(executorRole, address(0));
@@ -171,6 +170,7 @@ contract DeployMemeForge is Script {
         console.log("Token Owner:", exampleToken.owner(), "(Timelock for governance)");
         console.log("=====================================\n");
 
-        return (registry, implementation, soulNFT, stakingVault, mockVRF, exampleToken, timelock, governor, helperConfig);
+        return
+            (registry, implementation, soulNFT, stakingVault, mockVRF, exampleToken, timelock, governor, helperConfig);
     }
 }

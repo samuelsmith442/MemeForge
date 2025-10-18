@@ -150,15 +150,15 @@ contract GovernanceTest is Test {
     function test_RevertWhen_ProposalThresholdNotMet() public {
         // Create a new voter with insufficient tokens
         address poorVoter = address(5);
-        
+
         vm.prank(owner);
         token.transfer(poorVoter, 500e18); // Only 500 tokens, needs 1000
-        
+
         vm.prank(poorVoter);
         token.delegate(poorVoter);
-        
+
         vm.roll(block.number + 1);
-        
+
         address[] memory targets = new address[](1);
         uint256[] memory values = new uint256[](1);
         bytes[] memory calldatas = new bytes[](1);
