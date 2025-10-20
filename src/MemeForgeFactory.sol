@@ -140,12 +140,8 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         MemeSoulNFT nft = new MemeSoulNFT();
         soulNFT = address(nft);
 
-        // Set staking vault (safe, no external call to msg.sender)
-        memeToken.setStakingVault(stakingVault);
-
         // CEI Pattern: Update state BEFORE any external calls
-        // Note: We update with governor/timelock as address(0) initially if governance not enabled
-        // Store deployment info in registry
+        // Store deployment info in registry FIRST
         DeploymentInfo memory info = DeploymentInfo({
             token: token,
             soulNFT: soulNFT,
@@ -160,10 +156,16 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         allMemecoins.push(token);
         creatorMemecoins[msg.sender].push(token);
 
-        // Deploy governance if enabled (after state updates)
+        // EFFECTS complete - now safe to make external calls
+        
+        // Set staking vault (external call to owned contract)
+        memeToken.setStakingVault(stakingVault);
+
+        // Deploy governance if enabled
         if (params.enableGovernance) {
             (governor, timelock) = _deployGovernance(token);
             // Update deployment info with governance addresses
+            // aderyn-fp-next-line(reentrancy-state-change) - Updating existing registry entry after governance deployment
             deployments[token].governor = governor;
             deployments[token].timelock = timelock;
         }
