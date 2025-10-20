@@ -9,13 +9,14 @@ import {TokenBoundAccount} from "./TokenBoundAccount.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title MemeForgeFactory
  * @notice Factory contract for one-click memecoin deployment
  * @dev Deploys complete memecoin ecosystem: Token, NFT, Governance, TBA
  */
-contract MemeForgeFactory is Ownable {
+contract MemeForgeFactory is Ownable, ReentrancyGuard {
     ///////////////////
     // State Variables
     ///////////////////
@@ -119,6 +120,7 @@ contract MemeForgeFactory is Ownable {
     function deployMemecoin(DeploymentParams calldata params)
         external
         payable
+        nonReentrant
         returns (address token, address soulNFT, address governor, address timelock)
     {
         // Validate parameters
@@ -138,37 +140,16 @@ contract MemeForgeFactory is Ownable {
         MemeSoulNFT nft = new MemeSoulNFT();
         soulNFT = address(nft);
 
-        // Create metadata for Soul NFT
-        MemeSoulNFT.MemecoinMetadata memory metadata = MemeSoulNFT.MemecoinMetadata({
-            name: params.name,
-            symbol: params.symbol,
-            theme: params.theme,
-            logoURI: params.logoURI,
-            createdAt: block.timestamp,
-            creator: msg.sender
-        });
-
-        // Mint Soul NFT for the token
-        nft.mintSoulNFT(msg.sender, token, metadata, params.logoURI);
-        
-        // Transfer NFT ownership to creator
-        nft.transferOwnership(msg.sender);
-
-        // Set staking vault on token
+        // Set staking vault (safe, no external call to msg.sender)
         memeToken.setStakingVault(stakingVault);
 
         // Deploy governance if enabled
         if (params.enableGovernance) {
             (governor, timelock) = _deployGovernance(token);
-        } else {
-            // If no governance, transfer token ownership to creator
-            memeToken.transferOwnership(msg.sender);
         }
-        
-        // Transfer initial supply to creator
-        memeToken.transfer(msg.sender, params.initialSupply);
 
-        // Store deployment info
+        // CEI Pattern: Update state BEFORE external calls to msg.sender
+        // Store deployment info in registry
         DeploymentInfo memory info = DeploymentInfo({
             token: token,
             soulNFT: soulNFT,
@@ -182,6 +163,30 @@ contract MemeForgeFactory is Ownable {
         deployments[token] = info;
         allMemecoins.push(token);
         creatorMemecoins[msg.sender].push(token);
+
+        // EFFECTS complete - now safe to make external calls to msg.sender
+
+        // Create metadata for Soul NFT
+        MemeSoulNFT.MemecoinMetadata memory metadata = MemeSoulNFT.MemecoinMetadata({
+            name: params.name,
+            symbol: params.symbol,
+            theme: params.theme,
+            logoURI: params.logoURI,
+            createdAt: block.timestamp,
+            creator: msg.sender
+        });
+
+        // External calls to msg.sender (potential reentrancy - protected by nonReentrant)
+        nft.mintSoulNFT(msg.sender, token, metadata, params.logoURI);
+        nft.transferOwnership(msg.sender);
+        
+        // Transfer tokens and ownership
+        memeToken.transfer(msg.sender, params.initialSupply);
+        
+        // Transfer token ownership after token transfer
+        if (!params.enableGovernance) {
+            memeToken.transferOwnership(msg.sender);
+        }
 
         emit MemecoinDeployed(token, soulNFT, msg.sender, governor, timelock, params.name, params.symbol);
 
