@@ -143,18 +143,14 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         // Set staking vault (safe, no external call to msg.sender)
         memeToken.setStakingVault(stakingVault);
 
-        // Deploy governance if enabled
-        if (params.enableGovernance) {
-            (governor, timelock) = _deployGovernance(token);
-        }
-
-        // CEI Pattern: Update state BEFORE external calls to msg.sender
+        // CEI Pattern: Update state BEFORE any external calls
+        // Note: We update with governor/timelock as address(0) initially if governance not enabled
         // Store deployment info in registry
         DeploymentInfo memory info = DeploymentInfo({
             token: token,
             soulNFT: soulNFT,
-            governor: governor,
-            timelock: timelock,
+            governor: address(0), // Will be updated if governance enabled
+            timelock: address(0), // Will be updated if governance enabled
             creator: msg.sender,
             deployedAt: block.timestamp,
             exists: true
@@ -163,6 +159,14 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         deployments[token] = info;
         allMemecoins.push(token);
         creatorMemecoins[msg.sender].push(token);
+
+        // Deploy governance if enabled (after state updates)
+        if (params.enableGovernance) {
+            (governor, timelock) = _deployGovernance(token);
+            // Update deployment info with governance addresses
+            deployments[token].governor = governor;
+            deployments[token].timelock = timelock;
+        }
 
         // EFFECTS complete - now safe to make external calls to msg.sender
 
