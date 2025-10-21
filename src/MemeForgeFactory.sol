@@ -242,6 +242,9 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         // Renounce factory's admin role for decentralization
         TimelockController(payable(timelock)).renounceRole(adminRole, address(this));
 
+        // Set governance address on token before transferring ownership
+        MemeToken(token).setGovernance(governor);
+
         // Transfer token ownership to timelock
         MemeToken(token).transferOwnership(timelock);
 
