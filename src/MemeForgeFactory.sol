@@ -27,6 +27,7 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
     // Deployer contracts
     TokenDeployer public immutable tokenDeployer;
     NFTDeployer public immutable nftDeployer;
+    DeploymentLib public immutable governanceDeployer;
 
     // Governance parameters
     uint48 public votingDelay = 1 days;
@@ -117,6 +118,7 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         // Deploy deployer contracts
         tokenDeployer = new TokenDeployer();
         nftDeployer = new NFTDeployer();
+        governanceDeployer = new DeploymentLib();
     }
 
     /**
@@ -171,9 +173,14 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
 
         // Deploy governance if enabled
         if (params.enableGovernance) {
-            (governor, timelock) = DeploymentLib.deployGovernance(
+            (governor, timelock) = governanceDeployer.deployGovernance(
                 token, votingDelay, votingPeriod, proposalThreshold, quorumPercentage, timelockDelay, msg.sender
             );
+
+            // Set governance address and transfer ownership to timelock
+            memeToken.setGovernance(governor);
+            memeToken.transferOwnership(timelock);
+
             // Update deployment info with governance addresses
             // aderyn-fp-next-line(reentrancy-state-change) - Updating existing registry entry after governance deployment
             deployments[token].governor = governor;

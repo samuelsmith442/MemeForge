@@ -9,10 +9,11 @@ import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 
 /**
  * @title DeploymentLib
- * @notice Library for deploying memecoin components
+ * @notice Contract for deploying governance components
  * @dev Extracted to reduce MemeForgeFactory contract size
+ * Changed from library to contract to avoid size limit issues
  */
-library DeploymentLib {
+contract DeploymentLib {
     /**
      * @notice Deploy governance contracts for a memecoin
      * @param token Address of the MemeToken
@@ -66,15 +67,10 @@ library DeploymentLib {
         // Grant admin role to creator for future governance management
         TimelockController(payable(timelock)).grantRole(adminRole, creator);
 
-        // Renounce factory's admin role for decentralization
+        // Renounce deployer's admin role for decentralization
         TimelockController(payable(timelock)).renounceRole(adminRole, address(this));
 
-        // Set governance address on token before transferring ownership
-        MemeToken(token).setGovernance(governor);
-
-        // Transfer token ownership to timelock
-        MemeToken(token).transferOwnership(timelock);
-
+        // Note: Token ownership and governance setup handled by factory
         return (governor, timelock);
     }
 }
