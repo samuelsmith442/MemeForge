@@ -240,7 +240,7 @@ contract MemeTokenTest is Test {
         vm.prank(user1);
         memeToken.stake(5000 * 1e18);
 
-        (uint256 staked, , uint256 lastStake) = memeToken.getStakingInfo(user1);
+        (uint256 staked,, uint256 lastStake) = memeToken.getStakingInfo(user1);
 
         assertEq(staked, 5000 * 1e18);
         assertEq(lastStake, block.timestamp);

@@ -133,7 +133,9 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         if (msg.value < deploymentFee) revert MemeForgeFactory__InsufficientFee();
 
         // Deploy MemeToken (factory receives initial supply)
-        MemeToken memeToken = new MemeToken(params.name, params.symbol, params.initialSupply, params.rewardRate, params.theme, params.logoURI);
+        MemeToken memeToken = new MemeToken(
+            params.name, params.symbol, params.initialSupply, params.rewardRate, params.theme, params.logoURI
+        );
         token = address(memeToken);
 
         // Deploy MemeSoulNFT (factory becomes owner)
@@ -157,7 +159,7 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         creatorMemecoins[msg.sender].push(token);
 
         // EFFECTS complete - now safe to make external calls
-        
+
         // Set staking vault (external call to owned contract)
         memeToken.setStakingVault(stakingVault);
 
@@ -185,10 +187,10 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         // External calls to msg.sender (potential reentrancy - protected by nonReentrant)
         nft.mintSoulNFT(msg.sender, token, metadata, params.logoURI);
         nft.transferOwnership(msg.sender);
-        
+
         // Transfer tokens and ownership
         memeToken.transfer(msg.sender, params.initialSupply);
-        
+
         // Transfer token ownership after token transfer
         if (!params.enableGovernance) {
             memeToken.transferOwnership(msg.sender);
@@ -217,7 +219,12 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         // Deploy Governor
         governor = address(
             new MemeGovernor(
-                IVotes(token), TimelockController(payable(timelock)), votingDelay, votingPeriod, proposalThreshold, quorumPercentage
+                IVotes(token),
+                TimelockController(payable(timelock)),
+                votingDelay,
+                votingPeriod,
+                proposalThreshold,
+                quorumPercentage
             )
         );
 
@@ -228,10 +235,10 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
 
         TimelockController(payable(timelock)).grantRole(proposerRole, governor);
         TimelockController(payable(timelock)).grantRole(executorRole, address(0));
-        
+
         // Grant admin role to creator for future governance management
         TimelockController(payable(timelock)).grantRole(adminRole, msg.sender);
-        
+
         // Renounce factory's admin role for decentralization
         TimelockController(payable(timelock)).renounceRole(adminRole, address(this));
 

@@ -7,11 +7,11 @@ import "../interfaces/IVRFCoordinatorV2.sol";
  * @title MockVRFCoordinatorV2
  * @notice Mock VRF Coordinator for testing ONLY
  * @dev Provides instant randomness without actual Chainlink VRF
- * 
+ *
  * ⚠️ WARNING: DO NOT USE IN PRODUCTION ⚠️
- * This contract uses weak randomness (block.timestamp, block.prevrandao) 
+ * This contract uses weak randomness (block.timestamp, block.prevrandao)
  * which is predictable and manipulable by miners/validators.
- * 
+ *
  * FOR TESTING PURPOSES ONLY!
  * Use real Chainlink VRF in production for cryptographically secure randomness.
  */
