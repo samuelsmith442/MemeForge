@@ -2,9 +2,10 @@
 pragma solidity ^0.8.24;
 
 import {MemeToken} from "./MemeToken.sol";
-import {MemeSoulNFT} from "./MemeSoulNFT.sol";
 import {ERC6551Registry} from "./ERC6551Registry.sol";
 import {TokenBoundAccount} from "./TokenBoundAccount.sol";
+import {TokenDeployer} from "./deployers/TokenDeployer.sol";
+import {NFTDeployer} from "./deployers/NFTDeployer.sol";
 import {DeploymentLib} from "./libraries/DeploymentLib.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
@@ -22,6 +23,10 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
     ERC6551Registry public immutable registry;
     TokenBoundAccount public immutable implementation;
     address public immutable stakingVault;
+
+    // Deployer contracts
+    TokenDeployer public immutable tokenDeployer;
+    NFTDeployer public immutable nftDeployer;
 
     // Governance parameters
     uint48 public votingDelay = 1 days;
@@ -108,6 +113,10 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         registry = ERC6551Registry(_registry);
         implementation = TokenBoundAccount(payable(_implementation));
         stakingVault = _stakingVault;
+
+        // Deploy deployer contracts
+        tokenDeployer = new TokenDeployer();
+        nftDeployer = new NFTDeployer();
     }
 
     /**
@@ -133,15 +142,11 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         // Check deployment fee
         if (msg.value < deploymentFee) revert InsufficientFee();
 
-        // Deploy MemeToken (factory receives initial supply)
-        MemeToken memeToken = new MemeToken(
+        // Deploy MemeToken via TokenDeployer
+        token = tokenDeployer.deployToken(
             params.name, params.symbol, params.initialSupply, params.rewardRate, params.theme, params.logoURI
         );
-        token = address(memeToken);
-
-        // Deploy MemeSoulNFT (factory becomes owner)
-        MemeSoulNFT nft = new MemeSoulNFT();
-        soulNFT = address(nft);
+        MemeToken memeToken = MemeToken(token);
 
         // CEI Pattern: Update state BEFORE any external calls
         // Store deployment info in registry FIRST
@@ -177,19 +182,13 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
 
         // EFFECTS complete - now safe to make external calls to msg.sender
 
-        // Create metadata for Soul NFT
-        MemeSoulNFT.MemecoinMetadata memory metadata = MemeSoulNFT.MemecoinMetadata({
-            name: params.name,
-            symbol: params.symbol,
-            theme: params.theme,
-            logoURI: params.logoURI,
-            createdAt: block.timestamp,
-            creator: msg.sender
-        });
+        // Deploy and mint NFT via NFTDeployer
+        soulNFT = nftDeployer.deployAndMintNFT(
+            msg.sender, token, params.name, params.symbol, params.theme, params.logoURI, msg.sender
+        );
 
-        // External calls to msg.sender (potential reentrancy - protected by nonReentrant)
-        nft.mintSoulNFT(msg.sender, token, metadata, params.logoURI);
-        nft.transferOwnership(msg.sender);
+        // Update soulNFT in deployment info
+        deployments[token].soulNFT = soulNFT;
 
         // Transfer tokens and ownership
         memeToken.transfer(msg.sender, params.initialSupply);
