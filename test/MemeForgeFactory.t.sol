@@ -194,7 +194,7 @@ contract MemeForgeFactoryTest is Test {
         });
 
         vm.prank(creator1);
-        vm.expectRevert(MemeForgeFactory.MemeForgeFactory__InvalidParameters.selector);
+        vm.expectRevert(MemeForgeFactory.InvalidParams.selector);
         factory.deployMemecoin(params);
     }
 
@@ -210,7 +210,7 @@ contract MemeForgeFactoryTest is Test {
         });
 
         vm.prank(creator1);
-        vm.expectRevert(MemeForgeFactory.MemeForgeFactory__InvalidParameters.selector);
+        vm.expectRevert(MemeForgeFactory.InvalidParams.selector);
         factory.deployMemecoin(params);
     }
 
@@ -226,7 +226,7 @@ contract MemeForgeFactoryTest is Test {
         });
 
         vm.prank(creator1);
-        vm.expectRevert(MemeForgeFactory.MemeForgeFactory__InvalidParameters.selector);
+        vm.expectRevert(MemeForgeFactory.InvalidParams.selector);
         factory.deployMemecoin(params);
     }
 
@@ -245,7 +245,7 @@ contract MemeForgeFactoryTest is Test {
         });
 
         vm.prank(creator1);
-        vm.expectRevert(MemeForgeFactory.MemeForgeFactory__InsufficientFee.selector);
+        vm.expectRevert(MemeForgeFactory.InsufficientFee.selector);
         factory.deployMemecoin{value: 0.5 ether}(params);
     }
 

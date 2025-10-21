@@ -3,11 +3,9 @@ pragma solidity ^0.8.24;
 
 import {MemeToken} from "./MemeToken.sol";
 import {MemeSoulNFT} from "./MemeSoulNFT.sol";
-import {MemeGovernor} from "./MemeGovernor.sol";
 import {ERC6551Registry} from "./ERC6551Registry.sol";
 import {TokenBoundAccount} from "./TokenBoundAccount.sol";
-import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
-import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
+import {DeploymentLib} from "./libraries/DeploymentLib.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
@@ -34,6 +32,10 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
 
     // Deployment fee (optional)
     uint256 public deploymentFee;
+
+    // Use shorter error messages to save bytecode
+    error InvalidParams();
+    error InsufficientFee();
 
     // Registry of deployed memecoins
     address[] public allMemecoins;
@@ -88,8 +90,7 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
     // Errors
     ///////////////////
 
-    error MemeForgeFactory__InsufficientFee();
-    error MemeForgeFactory__InvalidParameters();
+    error Unauthorized();
     error MemeForgeFactory__DeploymentNotFound();
     error MemeForgeFactory__TransferFailed();
 
@@ -125,12 +126,12 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
     {
         // Validate parameters
         if (bytes(params.name).length == 0 || bytes(params.symbol).length == 0) {
-            revert MemeForgeFactory__InvalidParameters();
+            revert InvalidParams();
         }
-        if (params.initialSupply == 0) revert MemeForgeFactory__InvalidParameters();
+        if (params.initialSupply == 0) revert InvalidParams();
 
         // Check deployment fee
-        if (msg.value < deploymentFee) revert MemeForgeFactory__InsufficientFee();
+        if (msg.value < deploymentFee) revert InsufficientFee();
 
         // Deploy MemeToken (factory receives initial supply)
         MemeToken memeToken = new MemeToken(
@@ -165,7 +166,9 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
 
         // Deploy governance if enabled
         if (params.enableGovernance) {
-            (governor, timelock) = _deployGovernance(token);
+            (governor, timelock) = DeploymentLib.deployGovernance(
+                token, votingDelay, votingPeriod, proposalThreshold, quorumPercentage, timelockDelay, msg.sender
+            );
             // Update deployment info with governance addresses
             // aderyn-fp-next-line(reentrancy-state-change) - Updating existing registry entry after governance deployment
             deployments[token].governor = governor;
@@ -199,56 +202,6 @@ contract MemeForgeFactory is Ownable, ReentrancyGuard {
         emit MemecoinDeployed(token, soulNFT, msg.sender, governor, timelock, params.name, params.symbol);
 
         return (token, soulNFT, governor, timelock);
-    }
-
-    /**
-     * @notice Deploy governance contracts for a memecoin
-     * @param token Address of the MemeToken
-     * @return governor Address of deployed MemeGovernor
-     * @return timelock Address of deployed TimelockController
-     */
-    function _deployGovernance(address token) internal returns (address governor, address timelock) {
-        // Deploy TimelockController (factory is temporary admin)
-        address[] memory proposers = new address[](1);
-        address[] memory executors = new address[](1);
-        proposers[0] = address(0); // Will be set to governor
-        executors[0] = address(0); // Anyone can execute
-
-        timelock = address(new TimelockController(timelockDelay, proposers, executors, address(this)));
-
-        // Deploy Governor
-        governor = address(
-            new MemeGovernor(
-                IVotes(token),
-                TimelockController(payable(timelock)),
-                votingDelay,
-                votingPeriod,
-                proposalThreshold,
-                quorumPercentage
-            )
-        );
-
-        // Grant roles
-        bytes32 proposerRole = TimelockController(payable(timelock)).PROPOSER_ROLE();
-        bytes32 executorRole = TimelockController(payable(timelock)).EXECUTOR_ROLE();
-        bytes32 adminRole = TimelockController(payable(timelock)).DEFAULT_ADMIN_ROLE();
-
-        TimelockController(payable(timelock)).grantRole(proposerRole, governor);
-        TimelockController(payable(timelock)).grantRole(executorRole, address(0));
-
-        // Grant admin role to creator for future governance management
-        TimelockController(payable(timelock)).grantRole(adminRole, msg.sender);
-
-        // Renounce factory's admin role for decentralization
-        TimelockController(payable(timelock)).renounceRole(adminRole, address(this));
-
-        // Set governance address on token before transferring ownership
-        MemeToken(token).setGovernance(governor);
-
-        // Transfer token ownership to timelock
-        MemeToken(token).transferOwnership(timelock);
-
-        return (governor, timelock);
     }
 
     ///////////////////
