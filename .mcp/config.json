@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "foundry": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-foundry"],
+      "env": {
+        "FOUNDRY_PROJECT_ROOT": "/home/ubuntuonwindows11/Cyfrin_Updraft/MemeForge"
+      },
+      "description": "Foundry smart contract development tools"
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/ubuntuonwindows11/Cyfrin_Updraft/MemeForge"],
+      "description": "File system access for the project"
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git"],
+      "env": {
+        "GIT_DIR": "/home/ubuntuonwindows11/Cyfrin_Updraft/MemeForge/.git"
+      },
+      "description": "Git repository operations"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "GitHub API access"
+    }
+  }
+}

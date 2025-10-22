@@ -139,6 +139,21 @@ This is an ETHGlobal hackathon project. Contributions, issues, and feature reque
 
 ---
 
+## 📚 Documentation
+
+Complete documentation is available in the [`docs/`](docs/) folder:
+
+- **[Documentation Index](docs/INDEX.md)** - Complete documentation index
+- **[Architecture](docs/ARCHITECTURE.md)** - System architecture
+- **[Deployment Setup](docs/setup/DEPLOYMENT_SETUP.md)** - Deployment guide
+- **[Frontend Guide](docs/frontend/FRONTEND_README.md)** - Frontend documentation
+- **[MCP Setup](docs/setup/MCP_SETUP.md)** - MCP server configuration
+- **[Security Review](docs/SECURITY_REVIEW.md)** - Security analysis
+
+See [PROJECT_STATUS.md](PROJECT_STATUS.md) for current progress and [PROJECT_PLAN.md](PROJECT_PLAN.md) for the complete development roadmap.
+
+---
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

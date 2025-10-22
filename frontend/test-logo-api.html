@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Logo Generation API</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #0070f3;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #0051cc;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .result img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .error {
+            color: #e00;
+            background: #fee;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0070f3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Test Logo Generation API</h1>
+        
+        <form id="logoForm">
+            <div class="form-group">
+                <label for="name">Memecoin Name *</label>
+                <input type="text" id="name" required placeholder="e.g., MoonDoge">
+            </div>
+
+            <div class="form-group">
+                <label for="theme">Theme *</label>
+                <select id="theme" required>
+                    <option value="">Select a theme...</option>
+                    <option value="space">🚀 Space & Cosmos</option>
+                    <option value="gaming">🎮 Gaming</option>
+                    <option value="meme">😂 Classic Meme</option>
+                    <option value="animal">🐕 Animals</option>
+                    <option value="food">🍕 Food & Drinks</option>
+                    <option value="tech">💻 Technology</option>
+                    <option value="nature">🌿 Nature</option>
+                    <option value="fantasy">🧙 Fantasy</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="style">Style *</label>
+                <select id="style" required>
+                    <option value="">Select a style...</option>
+                    <option value="cartoon">Cartoon</option>
+                    <option value="realistic">Realistic</option>
+                    <option value="abstract">Abstract</option>
+                    <option value="minimalist">Minimalist</option>
+                    <option value="3d">3D</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="additionalPrompt">Additional Details (Optional)</label>
+                <textarea id="additionalPrompt" rows="3" placeholder="e.g., Make it colorful and fun"></textarea>
+            </div>
+
+            <button type="submit">Generate Logo</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating your logo... This may take 10-20 seconds.</p>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="result" id="result">
+            <h3>✅ Logo Generated!</h3>
+            <p><strong>Prompt:</strong> <span id="prompt"></span></p>
+            <p><strong>Revised Prompt:</strong> <span id="revisedPrompt"></span></p>
+            <img id="logoImage" alt="Generated Logo">
+            <p style="margin-top: 15px;">
+                <a id="downloadLink" download="memecoin-logo.png" style="color: #0070f3;">Download Logo</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('logoForm');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const result = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Hide previous results
+            error.classList.remove('show');
+            result.classList.remove('show');
+            loading.classList.add('show');
+
+            // Get form data
+            const data = {
+                name: document.getElementById('name').value,
+                theme: document.getElementById('theme').value,
+                style: document.getElementById('style').value,
+                additionalPrompt: document.getElementById('additionalPrompt').value,
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/ai/generate-logo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const json = await response.json();
+
+                loading.classList.remove('show');
+
+                if (!response.ok) {
+                    throw new Error(json.message || 'Failed to generate logo');
+                }
+
+                // Show result
+                document.getElementById('prompt').textContent = json.prompt;
+                document.getElementById('revisedPrompt').textContent = json.revisedPrompt || 'N/A';
+                document.getElementById('logoImage').src = json.imageUrl;
+                document.getElementById('downloadLink').href = json.imageUrl;
+                result.classList.add('show');
+
+            } catch (err) {
+                loading.classList.remove('show');
+                error.textContent = '❌ Error: ' + err.message;
+                error.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
