@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Parameter Suggestions API</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background: #0070f3;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #0051cc;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            display: none;
+        }
+        .result.show {
+            display: block;
+        }
+        .result h3 {
+            margin-top: 0;
+            color: #0070f3;
+        }
+        .param-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-left: 4px solid #0070f3;
+        }
+        .param-section h4 {
+            margin-top: 0;
+            color: #333;
+        }
+        .param-item {
+            margin: 8px 0;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+        .recommendations {
+            list-style: none;
+            padding: 0;
+        }
+        .recommendations li {
+            padding: 10px;
+            margin: 8px 0;
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+            border-radius: 3px;
+        }
+        .error {
+            color: #e00;
+            background: #fee;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+        .error.show {
+            display: block;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0070f3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💡 Test Parameter Suggestions API</h1>
+        
+        <form id="paramsForm">
+            <div class="form-group">
+                <label for="name">Memecoin Name *</label>
+                <input type="text" id="name" required placeholder="e.g., MoonDoge">
+            </div>
+
+            <div class="form-group">
+                <label for="theme">Theme *</label>
+                <select id="theme" required>
+                    <option value="">Select a theme...</option>
+                    <option value="space">🚀 Space & Cosmos</option>
+                    <option value="gaming">🎮 Gaming</option>
+                    <option value="meme">😂 Classic Meme</option>
+                    <option value="animal">🐕 Animals</option>
+                    <option value="food">🍕 Food & Drinks</option>
+                    <option value="tech">💻 Technology</option>
+                    <option value="nature">🌿 Nature</option>
+                    <option value="fantasy">🧙 Fantasy</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="targetAudience">Target Audience (Optional)</label>
+                <input type="text" id="targetAudience" placeholder="e.g., gamers and crypto enthusiasts">
+            </div>
+
+            <div class="form-group">
+                <label for="goals">Goals (Optional)</label>
+                <textarea id="goals" rows="3" placeholder="e.g., build strong community, enable governance, reward long-term holders"></textarea>
+            </div>
+
+            <button type="submit">Generate Suggestions</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating optimal parameters... This may take 10-15 seconds.</p>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="result" id="result">
+            <h3>✅ Parameter Suggestions Generated!</h3>
+            
+            <div class="param-section">
+                <h4>📊 Tokenomics</h4>
+                <div id="tokenomics"></div>
+            </div>
+
+            <div class="param-section">
+                <h4>📈 Distribution</h4>
+                <div id="distribution"></div>
+            </div>
+
+            <div class="param-section">
+                <h4>🔒 Staking</h4>
+                <div id="staking"></div>
+            </div>
+
+            <div class="param-section">
+                <h4>🗳️ Governance</h4>
+                <div id="governance"></div>
+            </div>
+
+            <div class="param-section">
+                <h4>💡 Recommendations</h4>
+                <ul class="recommendations" id="recommendations"></ul>
+            </div>
+
+            <div class="param-section">
+                <h4>📝 Reasoning</h4>
+                <div id="reasoning"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('paramsForm');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const result = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Hide previous results
+            error.classList.remove('show');
+            result.classList.remove('show');
+            loading.classList.add('show');
+
+            // Get form data
+            const data = {
+                name: document.getElementById('name').value,
+                theme: document.getElementById('theme').value,
+                targetAudience: document.getElementById('targetAudience').value,
+                goals: document.getElementById('goals').value,
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/ai/suggest-params', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const json = await response.json();
+
+                loading.classList.remove('show');
+
+                if (!response.ok) {
+                    throw new Error(json.message || 'Failed to generate suggestions');
+                }
+
+                // Display results
+                const s = json.suggestions;
+
+                // Tokenomics
+                document.getElementById('tokenomics').innerHTML = `
+                    <div class="param-item"><strong>Total Supply:</strong> ${s.tokenomics.totalSupply}</div>
+                    <div class="param-item"><strong>Initial Price:</strong> $${s.tokenomics.initialPrice}</div>
+                    <div class="param-item"><strong>Max Supply:</strong> ${s.tokenomics.maxSupply}</div>
+                `;
+
+                // Distribution
+                document.getElementById('distribution').innerHTML = `
+                    <div class="param-item"><strong>Public Sale:</strong> ${s.distribution.publicSale}</div>
+                    <div class="param-item"><strong>Liquidity:</strong> ${s.distribution.liquidity}</div>
+                    <div class="param-item"><strong>Team:</strong> ${s.distribution.team}</div>
+                    <div class="param-item"><strong>Marketing:</strong> ${s.distribution.marketing}</div>
+                    <div class="param-item"><strong>Treasury:</strong> ${s.distribution.treasury}</div>
+                `;
+
+                // Staking
+                document.getElementById('staking').innerHTML = `
+                    <div class="param-item"><strong>Min Stake Period:</strong> ${s.staking.minStakePeriod} days</div>
+                    <div class="param-item"><strong>Max Stake Period:</strong> ${s.staking.maxStakePeriod} days</div>
+                    <div class="param-item"><strong>Base APY:</strong> ${s.staking.baseAPY}</div>
+                    <div class="param-item"><strong>Max APY:</strong> ${s.staking.maxAPY}</div>
+                `;
+
+                // Governance
+                document.getElementById('governance').innerHTML = `
+                    <div class="param-item"><strong>Proposal Threshold:</strong> ${s.governance.proposalThreshold} tokens</div>
+                    <div class="param-item"><strong>Voting Period:</strong> ${s.governance.votingPeriod} days</div>
+                    <div class="param-item"><strong>Quorum:</strong> ${s.governance.quorumPercentage}</div>
+                `;
+
+                // Recommendations
+                const recList = document.getElementById('recommendations');
+                recList.innerHTML = '';
+                s.recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.textContent = rec;
+                    recList.appendChild(li);
+                });
+
+                // Reasoning
+                document.getElementById('reasoning').innerHTML = `
+                    <div class="param-item"><strong>Tokenomics:</strong> ${s.reasoning.tokenomics}</div>
+                    <div class="param-item"><strong>Distribution:</strong> ${s.reasoning.distribution}</div>
+                    <div class="param-item"><strong>Staking:</strong> ${s.reasoning.staking}</div>
+                    <div class="param-item"><strong>Governance:</strong> ${s.reasoning.governance}</div>
+                `;
+
+                result.classList.add('show');
+
+            } catch (err) {
+                loading.classList.remove('show');
+                error.textContent = '❌ Error: ' + err.message;
+                error.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
