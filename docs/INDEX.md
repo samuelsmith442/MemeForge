@@ -43,6 +43,10 @@ Complete documentation for the MemeForge project.
 - **[FRONTEND_README.md](frontend/FRONTEND_README.md)** - Frontend documentation
 - **[QUICK_START.md](frontend/QUICK_START.md)** - Frontend quick start guide
 
+### Milestones & Progress
+- **[AI_INTEGRATION_COMPLETE.md](milestones/AI_INTEGRATION_COMPLETE.md)** - Phase 3 completion report
+- **[COMMIT_SUMMARY.md](milestones/COMMIT_SUMMARY.md)** - Day 11 commit details
+
 ---
 
 ## 📖 Documentation by Topic
@@ -70,9 +74,9 @@ Complete documentation for the MemeForge project.
 2. [Frontend Documentation](frontend/FRONTEND_README.md)
 3. [Quick Start Guide](frontend/QUICK_START.md)
 
-### Progress Reports
-1. [Day 10 Summary](day-10/DAY_10_SUMMARY.md)
-2. [Day 10 Final Status](day-10/DAY_10_FINAL_STATUS.md)
+### Milestones & Progress
+1. [AI Integration Complete](milestones/AI_INTEGRATION_COMPLETE.md)
+2. [Commit Summary - Day 11](milestones/COMMIT_SUMMARY.md)
 
 ---
 
