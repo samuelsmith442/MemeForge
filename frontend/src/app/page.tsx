@@ -2,57 +2,90 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="text-center p-8 bg-white rounded-2xl shadow-xl max-w-2xl">
-        <h1 className="text-5xl font-bold text-gray-900 mb-4">
-          🔥 MemeForge
-        </h1>
-        <p className="text-xl text-gray-600 mb-8">
-          AI-Powered Memecoin Creation Platform
-        </p>
+    <main className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 flex items-center justify-center p-4">
+      <div className="max-w-4xl w-full">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <div className="mb-6">
+            <div className="inline-block bg-gradient-to-br from-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl mb-4">
+              <span className="text-5xl">🔥</span>
+            </div>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
+            Forge Your Memecoin with AI
+          </h1>
+          <p className="text-xl text-purple-100 mb-8">
+            Turn your wildest meme ideas into a token with real utility. No coding. No hassle. Just fun.
+          </p>
+        </div>
 
-        {/* CTA Button */}
-        <Link
-          href="/create"
-          className="inline-block mb-8 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-lg hover:shadow-xl"
-        >
-          🚀 Create Your Memecoin
-        </Link>
-        
-        <div className="space-y-4 text-left">
-          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-            <h3 className="font-semibold text-green-900 mb-2">✅ API Status</h3>
-            <ul className="text-sm text-green-700 space-y-1">
-              <li>• OpenAI: Connected</li>
-              <li>• Pinata: Connected</li>
-              <li>• Logo Generation: Ready</li>
-            </ul>
+        {/* Main CTA Card */}
+        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
+            Describe Your Memecoin
+          </h2>
+          
+          <div className="mb-6">
+            <textarea
+              placeholder="Describe your memecoin in one sentence..."
+              rows={3}
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none text-gray-700"
+              disabled
+            />
           </div>
 
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 className="font-semibold text-blue-900 mb-2">🚀 Available Endpoints</h3>
-            <ul className="text-sm text-blue-700 space-y-1">
-              <li>• <code className="bg-blue-100 px-2 py-1 rounded">/api/ai/generate-logo</code></li>
-              <li>• <code className="bg-blue-100 px-2 py-1 rounded">/api/ai/suggest-params</code></li>
-              <li>• <code className="bg-blue-100 px-2 py-1 rounded">/api/ai/chat</code></li>
-            </ul>
+          <div className="mb-6">
+            <p className="text-sm text-gray-600 mb-2">Need inspiration? Try these:</p>
+            <div className="flex flex-wrap gap-2">
+              <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition text-gray-700">
+                A memecoin for gym bros who love 🐔
+              </button>
+              <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition text-gray-700">
+                A token for people who think pineapple belongs on 🍕
+              </button>
+              <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition text-gray-700">
+                A coin for meme lords who hate Mondays
+              </button>
+            </div>
           </div>
 
-          <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-            <h3 className="font-semibold text-purple-900 mb-2">🧪 Test the API</h3>
-            <p className="text-sm text-purple-700 mb-2">
-              Open <code className="bg-purple-100 px-2 py-1 rounded">test-logo-api.html</code> to test logo generation
-            </p>
-            <p className="text-xs text-purple-600">
-              Or use curl: <code className="bg-purple-100 px-1 rounded text-xs">curl -X POST http://localhost:3000/api/ai/generate-logo ...</code>
-            </p>
+          <Link
+            href="/create"
+            className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition shadow-lg hover:shadow-xl text-center"
+          >
+            🔥 Generate Memecoin
+          </Link>
+        </div>
+
+        {/* Features */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
+            <div className="text-4xl mb-3">🎨</div>
+            <h3 className="text-white font-bold mb-2">AI-Generated Logo</h3>
+            <p className="text-purple-100 text-sm">DALL·E 3 creates unique logos for your token</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
+            <div className="text-4xl mb-3">💡</div>
+            <h3 className="text-white font-bold mb-2">Smart Tokenomics</h3>
+            <p className="text-purple-100 text-sm">GPT-4 suggests optimal parameters</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
+            <div className="text-4xl mb-3">🚀</div>
+            <h3 className="text-white font-bold mb-2">One-Click Deploy</h3>
+            <p className="text-purple-100 text-sm">Deploy to blockchain in seconds</p>
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
-            Next.js 15 • OpenAI • Pinata • Web3
-          </p>
+        {/* Footer */}
+        <div className="text-center">
+          <p className="text-purple-200 mb-4">MemeForge: Where Memes Meet Utility</p>
+          <div className="flex justify-center gap-6 text-purple-200">
+            <a href="https://github.com/samuelsmith442/MemeForge" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+              GitHub
+            </a>
+            <a href="#" className="hover:text-white transition">Twitter</a>
+            <a href="#" className="hover:text-white transition">ETHGlobal</a>
+          </div>
         </div>
       </div>
     </main>

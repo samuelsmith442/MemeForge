@@ -56,14 +56,19 @@ export default function CreationWizard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            🚀 Create Your Memecoin
+          <div className="mb-6">
+            <div className="inline-block bg-gradient-to-br from-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl">
+              <span className="text-5xl">🔥</span>
+            </div>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Forge Your Memecoin with AI
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-purple-100">
             AI-powered memecoin creation in 4 simple steps
           </p>
         </div>
@@ -80,15 +85,15 @@ export default function CreationWizard() {
                     disabled={step.number > currentStep && !canProceed(step.number - 1)}
                     className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold transition-all ${
                       currentStep === step.number
-                        ? 'bg-blue-600 text-white shadow-lg scale-110'
+                        ? 'bg-white text-purple-600 shadow-lg scale-110'
                         : currentStep > step.number
                         ? 'bg-green-500 text-white'
-                        : 'bg-gray-200 text-gray-400'
+                        : 'bg-white/30 text-white/60'
                     } disabled:cursor-not-allowed`}
                   >
                     {currentStep > step.number ? '✓' : step.icon}
                   </button>
-                  <span className="mt-2 text-sm font-medium text-gray-700 text-center">
+                  <span className="mt-2 text-sm font-medium text-white text-center">
                     {step.title}
                   </span>
                 </div>
@@ -97,7 +102,7 @@ export default function CreationWizard() {
                 {index < steps.length - 1 && (
                   <div
                     className={`flex-1 h-1 mx-4 transition-all ${
-                      currentStep > step.number ? 'bg-green-500' : 'bg-gray-200'
+                      currentStep > step.number ? 'bg-green-500' : 'bg-white/30'
                     }`}
                   />
                 )}
@@ -265,7 +270,7 @@ export default function CreationWizard() {
             <button
               onClick={() => setCurrentStep((prev) => Math.min(4, prev + 1))}
               disabled={currentStep === 4 || !canProceed(currentStep)}
-              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
             >
               Next →
             </button>
