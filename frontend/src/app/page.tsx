@@ -1,6 +1,30 @@
-import Link from 'next/link';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+  const [description, setDescription] = useState('');
+
+  const examples = [
+    'A memecoin for gym bros who love 🐔',
+    'A token for people who think pineapple belongs on 🍕',
+    'A coin for meme lords who hate Mondays',
+  ];
+
+  const handleGenerate = () => {
+    if (description.trim()) {
+      // Store description and redirect to wizard
+      sessionStorage.setItem('memecoinDescription', description);
+      router.push('/create');
+    }
+  };
+
+  const handleExample = (example: string) => {
+    setDescription(example);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
@@ -27,34 +51,36 @@ export default function Home() {
           
           <div className="mb-6">
             <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe your memecoin in one sentence..."
               rows={3}
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition resize-none text-gray-700"
-              disabled
             />
           </div>
 
           <div className="mb-6">
             <p className="text-sm text-gray-600 mb-2">Need inspiration? Try these:</p>
             <div className="flex flex-wrap gap-2">
-              <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition text-gray-700">
-                A memecoin for gym bros who love 🐔
-              </button>
-              <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition text-gray-700">
-                A token for people who think pineapple belongs on 🍕
-              </button>
-              <button className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition text-gray-700">
-                A coin for meme lords who hate Mondays
-              </button>
+              {examples.map((example, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleExample(example)}
+                  className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition text-gray-700"
+                >
+                  {example}
+                </button>
+              ))}
             </div>
           </div>
 
-          <Link
-            href="/create"
-            className="block w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition shadow-lg hover:shadow-xl text-center"
+          <button
+            onClick={handleGenerate}
+            disabled={!description.trim()}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             🔥 Generate Memecoin
-          </Link>
+          </button>
         </div>
 
         {/* Features */}

@@ -1,9 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import LogoGenerator from '../ai/LogoGenerator';
-import ParameterSuggester from '../ai/ParameterSuggester';
-import AIChat from '../ai/AIChat';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import dynamic from 'next/dynamic';
+
+// Lazy load heavy components
+const LogoGenerator = dynamic(() => import('../ai/LogoGenerator'), {
+  loading: () => <div className="text-center py-12">Loading logo generator...</div>,
+});
+
+const ParameterSuggester = dynamic(() => import('../ai/ParameterSuggester'), {
+  loading: () => <div className="text-center py-12">Loading parameter suggester...</div>,
+});
+
+const AIChat = dynamic(() => import('../ai/AIChat'), {
+  loading: () => <div className="text-center py-4">Loading AI assistant...</div>,
+  ssr: false,
+});
 
 interface WizardData {
   name: string;
@@ -15,10 +27,20 @@ interface WizardData {
 
 export default function CreationWizard() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [showChat, setShowChat] = useState(false);
   const [wizardData, setWizardData] = useState<WizardData>({
     name: '',
     theme: '',
   });
+
+  // Load description from home page if available
+  useEffect(() => {
+    const description = sessionStorage.getItem('memecoinDescription');
+    if (description) {
+      // You can parse the description to extract name/theme or just store it
+      sessionStorage.removeItem('memecoinDescription');
+    }
+  }, []);
 
   const steps = [
     { number: 1, title: 'Basic Info', icon: '📝' },
@@ -132,7 +154,8 @@ export default function CreationWizard() {
                     value={wizardData.name}
                     onChange={(e) => setWizardData({ ...wizardData, name: e.target.value })}
                     placeholder="e.g., MoonDoge"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+                    required
                   />
                 </div>
 
@@ -144,7 +167,8 @@ export default function CreationWizard() {
                     id="wizard-theme"
                     value={wizardData.theme}
                     onChange={(e) => setWizardData({ ...wizardData, theme: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition"
+                    required
                   >
                     <option value="">Select a theme...</option>
                     <option value="space">🚀 Space & Cosmos</option>
@@ -158,10 +182,28 @@ export default function CreationWizard() {
                   </select>
                 </div>
 
-                {/* AI Chat Helper */}
+                {/* Validation message */}
+                {(!wizardData.name || !wizardData.theme) && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p className="text-sm text-yellow-800">
+                      ⚠️ Please fill in all required fields to continue
+                    </p>
+                  </div>
+                )}
+
+                {/* AI Chat Helper - Only load when clicked */}
                 <div className="mt-8 pt-8 border-t">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">💬 Need Help?</h3>
-                  <AIChat context={{ step: 'basic-info' }} className="h-[500px]" />
+                  <button
+                    onClick={() => setShowChat(!showChat)}
+                    className="flex items-center gap-2 text-lg font-bold text-purple-600 hover:text-purple-700 transition"
+                  >
+                    💬 {showChat ? 'Hide' : 'Need Help?'}
+                  </button>
+                  {showChat && (
+                    <div className="mt-4">
+                      <AIChat context={{ step: 'basic-info' }} className="h-[400px]" />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
