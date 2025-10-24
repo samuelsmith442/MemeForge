@@ -1,21 +1,53 @@
 'use client';
 
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
-// Lazy load heavy components
-const LogoGenerator = dynamic(() => import('../ai/LogoGenerator'), {
-  loading: () => <div className="text-center py-12">Loading logo generator...</div>,
-});
+// Lazy load heavy components with proper Next.js dynamic imports
+const LogoGenerator = dynamic(
+  () => import('../ai/LogoGenerator'),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading logo generator...</p>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
-const ParameterSuggester = dynamic(() => import('../ai/ParameterSuggester'), {
-  loading: () => <div className="text-center py-12">Loading parameter suggester...</div>,
-});
+const ParameterSuggester = dynamic(
+  () => import('../ai/ParameterSuggester'),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading parameter suggester...</p>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
-const AIChat = dynamic(() => import('../ai/AIChat'), {
-  loading: () => <div className="text-center py-4">Loading AI assistant...</div>,
-  ssr: false,
-});
+const AIChat = dynamic(
+  () => import('../ai/AIChat'),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center py-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
+          <p className="text-sm text-gray-600">Loading AI assistant...</p>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  }
+);
 
 interface WizardData {
   name: string;
