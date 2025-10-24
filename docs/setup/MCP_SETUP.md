@@ -2,12 +2,14 @@
 
 ## 🎯 What are MCP Servers?
 
-MCP servers provide AI assistants with access to external tools and data sources. For MemeForge, we can use:
+MCP servers provide AI assistants with access to external tools and data sources. For MemeForge, we use:
 
-1. **Foundry MCP** - Smart contract development tools
-2. **Filesystem MCP** - Project file access
-3. **Git MCP** - Repository operations
-4. **GitHub MCP** - GitHub API access
+1. **Next.js MCP** - Next.js development tools and debugging
+2. **Context7 MCP** - Up-to-date library documentation
+3. **Foundry MCP** - Smart contract development tools
+4. **Filesystem MCP** - Project file access (optional)
+5. **Git MCP** - Repository operations (optional)
+6. **GitHub MCP** - GitHub API access (optional)
 
 ---
 
@@ -21,19 +23,47 @@ This file configures all MCP servers for the project.
 
 ## 🚀 Available MCP Servers
 
-### 1. Foundry MCP Server
+### 1. Next.js MCP Server ⭐
+**Purpose:** Next.js development tools and debugging
+- Get build/runtime/type errors
+- Access development server logs
+- Retrieve page metadata
+- Get project structure
+- Debug Server Actions
+
+**Command:**
+```bash
+npx -y next-devtools-mcp@latest
+```
+
+**Documentation:** [NEXTJS_MCP_SETUP.md](./NEXTJS_MCP_SETUP.md)
+
+### 2. Context7 MCP Server ⭐
+**Purpose:** Up-to-date library documentation
+- Fetch current documentation for any library
+- Get code examples
+- Resolve library IDs
+- Access API references
+
+**Command:**
+```bash
+npx -y @upstash/context7-mcp
+```
+
+### 3. Foundry MCP Server ⭐
 **Purpose:** Smart contract development tools
 - Compile contracts
 - Run tests
 - Deploy contracts
 - Interact with blockchain
+- Analyze bytecode with Heimdall
 
 **Command:**
 ```bash
-npx -y @modelcontextprotocol/server-foundry
+npx -y @upstash/foundry-mcp
 ```
 
-### 2. Filesystem MCP Server
+### 4. Filesystem MCP Server
 **Purpose:** File system access
 - Read project files
 - Write files
@@ -45,7 +75,7 @@ npx -y @modelcontextprotocol/server-foundry
 npx -y @modelcontextprotocol/server-filesystem /path/to/project
 ```
 
-### 3. Git MCP Server
+### 5. Git MCP Server
 **Purpose:** Git operations
 - Commit changes
 - Create branches
@@ -57,7 +87,7 @@ npx -y @modelcontextprotocol/server-filesystem /path/to/project
 npx -y @modelcontextprotocol/server-git
 ```
 
-### 4. GitHub MCP Server
+### 6. GitHub MCP Server
 **Purpose:** GitHub API access
 - Create issues
 - Manage PRs
@@ -255,21 +285,28 @@ source ~/.bashrc
 
 ## 🎯 MCP Servers for MemeForge
 
-### Recommended Setup
+### Recommended Setup ⭐
 
 For optimal development experience with MemeForge:
 
-1. ✅ **Foundry MCP** - Essential for smart contract work
-2. ✅ **Filesystem MCP** - Useful for file operations
-3. ✅ **Git MCP** - Helpful for version control
-4. ⚠️ **GitHub MCP** - Optional, requires GitHub token
+1. ✅ **Next.js MCP** - Essential for frontend debugging
+2. ✅ **Context7 MCP** - Essential for documentation access
+3. ✅ **Foundry MCP** - Essential for smart contract work
+4. ⚠️ **Filesystem MCP** - Optional, useful for file operations
+5. ⚠️ **Git MCP** - Optional, helpful for version control
+6. ⚠️ **GitHub MCP** - Optional, requires GitHub token
 
 ### Minimal Setup
 
 If you just want to get started:
 
-1. ✅ **Foundry MCP** - For smart contract development
-2. ✅ **Filesystem MCP** - For file access
+1. ✅ **Next.js MCP** - For frontend development and debugging
+2. ✅ **Foundry MCP** - For smart contract development
+3. ✅ **Context7 MCP** - For library documentation
+
+### Current Configuration
+
+See `.mcp.json` in the project root for the active configuration.
 
 ---
 
