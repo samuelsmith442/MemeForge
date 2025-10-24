@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Home() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -8,6 +10,14 @@ export default function Home() {
         <p className="text-xl text-gray-600 mb-8">
           AI-Powered Memecoin Creation Platform
         </p>
+
+        {/* CTA Button */}
+        <Link
+          href="/create"
+          className="inline-block mb-8 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-lg hover:shadow-xl"
+        >
+          🚀 Create Your Memecoin
+        </Link>
         
         <div className="space-y-4 text-left">
           <div className="p-4 bg-green-50 rounded-lg border border-green-200">
@@ -23,6 +33,8 @@ export default function Home() {
             <h3 className="font-semibold text-blue-900 mb-2">🚀 Available Endpoints</h3>
             <ul className="text-sm text-blue-700 space-y-1">
               <li>• <code className="bg-blue-100 px-2 py-1 rounded">/api/ai/generate-logo</code></li>
+              <li>• <code className="bg-blue-100 px-2 py-1 rounded">/api/ai/suggest-params</code></li>
+              <li>• <code className="bg-blue-100 px-2 py-1 rounded">/api/ai/chat</code></li>
             </ul>
           </div>
 
